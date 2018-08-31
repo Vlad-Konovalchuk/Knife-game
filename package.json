@@ -1,23 +1,13 @@
 {
-  "name": "kniffgame1",
+  "name": "start",
   "version": "1.0.0",
-  "description": "Creating proto-game for social networks",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config webpack.config.js --mode development",
     "build": "webpack --mode production"
   },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "keywords": [
-    "knife",
-    "game",
-    "phaser"
-  ],
-  "author": "Vlad",
+  "author": "A",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -34,6 +24,7 @@
     "webpack-dev-server": "^3.1.5"
   },
   "dependencies": {
-    "phaser": "2.6.2"
+    "expose-loader": "^0.7.5",
+    "phaser-ce": "2.10.0"
   }
 }
