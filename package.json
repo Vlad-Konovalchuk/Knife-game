@@ -34,6 +34,6 @@
     "webpack-dev-server": "^3.1.5"
   },
   "dependencies": {
-    "phaser-plugin-game-scale": "^1.0.0"
+    "phaser": "2.6.2"
   }
 }
