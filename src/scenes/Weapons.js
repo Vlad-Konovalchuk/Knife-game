@@ -66,13 +66,13 @@ export default class Weapons extends Phaser.State {
         this.knifes = this.game.add.group();
         let knifeItem;
         this.knifeStore.forEach(el=>{
-            knifeItem =  this.knifes.create(-100,this.game.centerY+300,el.key);
+            knifeItem =  this.knifes.create(-1000,this.game.world.centerY,el.key);
             knifeItem.anchor.setTo(0.5);
             knifeItem.scale.setTo(0.7);
             knifeItem.customParam = {text:el.text};
         })
         this.currentKnife = this.knifes.next();
-        this.currentKnife.position.set(this.world.centerX,this.world.centerY);
+        this.currentKnife.position.set(this.game.world.centerX,this.game.world.centerY);
 
 // Left Arrow for switching
         this.leftArrow = this.game.add.sprite(60, this.world.centerY, 'arrow');
@@ -100,24 +100,25 @@ export default class Weapons extends Phaser.State {
 
     switchKnife(sprite,event) {
         console.log('Asd');
-        
        var newKnife,endX;
        if(sprite.customParams.direction > 0){
         newKnife = this.knifes.next();
-        endX =650 + this.currentKnife.width /2;
+        endX =this.game.world.width + this.currentKnife.width /2;
        }
        else {
         newKnife = this.knifes.previous()
         endX =-this.currentKnife.width/2;
        }
 
-       let newKnifeMove = this.game.add.tween(newKnife);
-       newKnifeMove.to({x:this.game.world.centerX},1000);
-       newKnifeMove.start();
+       this.currentKnife.x = endX;
+       newKnife.x = this.game.world.centerX;
+    //    let newKnifeMove = this.game.add.tween(newKnife);
+    //    newKnifeMove.to({x:this.game.world.centerX},640);
+    //    newKnifeMove.start();
 
-       let currentKnifeMove = this.game.add.tween(newKnife);
-       currentKnifeMove.to({x:endX},1000);
-       currentKnifeMove.start();
+    //    let currentKnifeMove = this.game.add.tween(newKnife);
+    //    currentKnifeMove.to({x:endX},640);
+    //    currentKnifeMove.start();
 
        this.currentKnife = newKnife;
     }
