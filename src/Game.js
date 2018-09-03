@@ -28,4 +28,12 @@ import Weapons from './scenes/Weapons';
           this.state.start('Menu')
       }
   }
-  new Game ()
+
+
+  FBInstant.initializeAsync().then(function () {
+    FBInstant.startGameAsync().then(function () {
+        console.log('Game Start');
+        new Game ()
+      })
+      .catch(error => console.log(error))
+  })
