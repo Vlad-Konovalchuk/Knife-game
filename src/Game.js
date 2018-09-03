@@ -3,6 +3,9 @@ import 'pixi';
 import 'phaser';
 import Menu from './scenes/Menu';
 import Play from './scenes/Play';
+import Settings from './scenes/Settings';
+import Leaders from './scenes/Leaders';
+import Weapons from './scenes/Weapons';
 
   class Game extends Phaser.Game{
       constructor(){
@@ -18,6 +21,10 @@ import Play from './scenes/Play';
         //   this.input.addPointer()
           this.state.add('Menu',Menu);
           this.state.add('Play',Play)
+          this.state.add('Settings',Settings)
+          this.state.add('Leaders',Leaders)
+          this.state.add('Weapons',Weapons)
+
           this.state.start('Menu')
       }
   }

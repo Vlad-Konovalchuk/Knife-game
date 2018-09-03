@@ -45,6 +45,7 @@ export default class Play extends Phaser.State {
         this.load.spritesheet("coin", coin, 70, 96);
     }
     create() {
+        this.score=0;
         console.log('start ');
         this.target = this.add.sprite(this.world.width / 2, 300, 'target')
         this.target.anchor.setTo(0.5, 0.5);
@@ -53,24 +54,38 @@ export default class Play extends Phaser.State {
         this.scoreText = this.add.text(
             10,
             10,
-            `Score: 0`, style
+            `Score: ${this.score}`, style
         );
         this.coinsText = this.add.text(
             250,
             this.world.top,
             `Coins: 0`, style
         );
-        // this.pauseTest = this.add.text( this.world.width / 2 + 280, (this.world.centerY / 5) * 4.5, "Pause",style)
+        this.pauseBtn = this.add.text(20,(this.world.centerY+200), "Pause",style)
+        this.pauseBtn.inputEnabled = true;
+        this.pauseBtn.events.onInputDown.add(() => {
+            this.game.paused = !this.game.paused;
+        }, this);
 
-        // this.exit = this.add.text( this.world.width / 2 - 280, (this.world.centerY / 5) * 4.5, "Exit",style)
+
+        this.exitBtn = this.add.text(250,(this.world.centerY+200), "Exit",style)
+        this.exitBtn.inputEnabled = true;
+        this.exitBtn.events.onInputDown.add(() => {
+            this.state.start('Menu')
+        }, this);
 
         // at the beginning of the game, both current rotation speed and new rotation speed are set to default rotation speed
         this.currentRotationSpeed = gameOptions.rotationSpeed;
         this.newRotationSpeed = gameOptions.rotationSpeed;
+
+
         // can the player throw a knife? Yes, at the beginning of the game
         this.canThrow = true;
+
         // group to store all rotating knives
         this.knifeGroup = this.add.group();
+        console.log(this.knifeGroup);
+
         // // adding the knife
         this.knife = this.add.sprite(
             this.world.width / 2,
@@ -83,13 +98,11 @@ export default class Play extends Phaser.State {
 
         // moving the target on front
         this.target.depth = 1;
+        this.target.bringToTop()
 
-        // waiting for player input to throw a knife
-        // this.input.on("pointerdown", this.throwKnife, this);
-        // this.game.enabled = true;
-        // this.knife.events.onDown.add( this.throwKnife, this);
-        // this.game.input.onDown.add(this.throwKnife, this);
-        this.world.events.onInputDown.add(this.throwKnife, this);
+        console.log(this.world);
+        console.log(this.game);
+
         // this is how we create a looped timer event
         // var timedEvent = this.time.events.add({
         //     delay: gameOptions.changeTime,
@@ -98,8 +111,8 @@ export default class Play extends Phaser.State {
         //     loop: true
         // });
         this.createCoin();
-        }
-    
+    }
+
     // method to change the rotation speed of the target
     changeSpeed() {
         // ternary operator to choose from +1 and -1
@@ -125,6 +138,7 @@ export default class Play extends Phaser.State {
         );
         console.log(this.newRotationSpeed);
     }
+    // Create the coin(apple now) on the target
     createCoin() {
         var coinAngle = Phaser.Math.angleBetween(0, 360, 0, 360);
         var radians = Phaser.Math.degToRad(coinAngle - 90);
@@ -144,354 +158,151 @@ export default class Play extends Phaser.State {
         this.coin.startAngle = coinAngle;
         this.coin.depth = 2;
         this.coin.hit = false;
+        this.coin.angle = coinAngle;
+
+        // saving coin start angle
+        this.coin.startAngle = coinAngle;
+
+        // coin depth is the same as target depth
+        this.coin.depth = 1;
+
     }
-    // createTimeOut() {
-    //     let that = this;
-    //     function randInt() {
-    //       var rand = Math.random() * +that.softCurrency;
-    //       rand = Math.floor(rand);
-    //       return rand;
-    //     }
-    //     function request() {
-    //         setTimeout(() => {
-    //             that.createCoin();
-    //         }, 60000);
-    //     }
-    //     request();
-    // }
     // method to throw a knife
     throwKnife() {
-        console.log('thrrow');
-        
         // can the player throw?
         if (this.canThrow) {
             // player can't throw anymore
             this.canThrow = false;
-            console.log('thrrow1');
-    let knifeThrow = this.game.add.tween(this.knife)
-    knifeThrow.to({y:this.target.y + this.target.width / 2}, gameOptions.throwSpeed,null,false)
-    knifeThrow.onComplete(function throwCallback(tween){
-            // at the moment, this is a legal hit
-         var legalHit = true;
-         console.log('throw2');
-         
-         // getting an array with all rotating knives
-         var children = this.knifeGroup.children;
 
-         // looping through rotating knives
-         for (var i = 0; i < children.length; i++) {
-             // is the knife too close to the i-th knife?
-             if (
-                 Math.abs(
-                     Phaser.Math.getShortestAngle(
-                      this.target.angle,
-                 )
-                 ) < gameOptions.minAngle
-          ) {
-              // this is not a legal hit
-              legalHit = false;
-              // this.score = scores.current;
-              // this.scoreText.setText(`Score: ${this.score}`);
+            let knifeThrow = this.game.add.tween(this.knife)
+            knifeThrow.to({
+                y: this.target.y + this.target.width / 2
+            }, gameOptions.throwSpeed * 2, null, false)
+            knifeThrow.onComplete.add(function throwCallback(tween) {
+                console.log('Callback');
 
-                 // no need to continue with the loop
-                 break;
-             }
+                // at the moment, this is a legal hit
+                var legalHit = true;
+                console.log('throw2');
 
-         }
-         // is this a legal hit
-      if (legalHit) {
-             // ----------------------   ---------------------------------------------------------------
-             console.log(this.coin.hit);
+                // getting an array with all rotating knives
+                var children = this.knifeGroup.children;
+                console.log('group', this.knife.children);
 
-             // console.log(Math.floor(Math.abs(Phaser.Math.getShortestAngle(this.target.angle, 190 - this.coin.startAngle))) < Math.abs(gameOptions.minAngle));
+                // looping through rotating knives
+                for (var i = 0; i < children.length; i++) {
+                    console.log('throw3');
 
-              if (
-                     Math.abs(
-                      Phaser.Math.getShortestAngle(
-                          this.target.angle,
-                          180 - this.coin.startAngle
-                      )
-                  ) < gameOptions.minAngle &&
-                  !this.coin.hit
-                 ) {
-                     // console.log('In if block  - true');
-                     // coin has been hit
-                     this.coin.hit = !this.coin.hit;
-                     this.softCurrency += 25;
-                  // console.log(this.softCurrency);
-                  this.coinsText.setText(`Coins: ${this.softCurrency}`);
-                     // change coin frame to show one slice
-                  this.coin.setFrame(1);
+                    // is the knife too close to the i-th knife?
+                    if (
+                        Math.abs(
+                            Phaser.Math.getShortestAngle(
+                                this.target.angle, children[i].impactAngle
+                            )
+                        ) < gameOptions.minAngle
+                    ) {
+                        // this is not a legal hit
+                        legalHit = false;
+                        console.log('throw4');
+                        // no need to continue with the loop
+                        break;
+                    }
+                }
+                // is this a legal hit
+                if (legalHit) {
 
-                  // add the other coin slice in the same coin posiiton
-                  var slice = this.add.sprite(this.coin.x, this.coin.y, "coin", 1);
+                    // is the knife close enough to the coin? And the appls is still to be hit?
+                    if (Math.abs(Phaser.Math.getShortestAngle(this.target.angle, 180 - this.coin.startAngle)) < gameOptions.minAngle && !this.coin.hit) {
 
-                  // same angle too.
-                  slice.angle = this.coin.angle;
+                        // coin has been hit
+                        this.coin.hit = true;
 
-                  // and same origin
-                     slice.setOrigin(0.5, 1);
+                        // change coin frame to show one slice
+                        this.coin.setFrame(1);
 
-                  // tween to make coin slices fall down
-                //   this.tweens.add({
-                //       // adding the knife to tween targets
-                //       targets: [this.coin, slice],
+                        // add the other coin slice in the same coin posiiton
+                        var slice = this.add.sprite(this.coin.x, this.coin.y, "coin", 1);
 
-                //       // y destination
-                //       y: this.world.centerY + this.coin.height,
+                        // same angle too.
+                        slice.angle = this.coin.angle;
 
-                //       // x destination
-                //       x: {
-                //           // running a function to get different x ends for each slice according to frame number
-                //           getEnd: function (target, key, value) {
-                //               return (
-                //                   Phaser.Math.angleBetween(0, this.world.width / 2) +
-                //                   (this.world.width / 2) * (target.frame.name - 1)
-                //               );
-                //           }
-                //       },
-                //       // rotation destination, in radians
-                //       angle: 45,
+                        // and same origin
+                        slice.anchor.setTo(0.5, 1);
+                        
+                        // tween to make coin slices fall down
+                        let sliceCoin = this.game.add.tween(this.coin, slice)
+                        sliceCoin.to({
+                                y: this.game.height + this.coin.height,
+                                // x destination
+                                x: {
+   // running a function to get different x ends for each slice according to frame number
+                                getEnd: function (target, key, value) {
+                                    return Phaser.Math.Between(0, this.world.width / 2) + (this.world.width / 2 * (target.frame - 1));}
+                                }
+                            },gameOptions.throwSpeed * 6,Phaser.Easing.Linear.None,false,2000)
+                        sliceCoin.onComplete.add(function coinTweenCallback(tween) {
+                        this.state.start("Play")
+                        }, this)
+                        sliceCoin.start()
+                    }
 
-                //       // tween duration
-                //       duration: gameOptions.throwSpeed * 6,
+                    // player can now throw again
+                    this.canThrow = true;
+                    this.score++;
+                    console.log('Score', this.score);
+                    this.scoreText.setText(`Score: ${this.score}`)
+                    // adding the rotating knife in the same place of the knife just landed on target
+                    var knife = this.add.sprite(this.knife.x, this.knife.y, "weapon");
 
-                //       // callback scope
-                //       callbackScope: this,
+                    // impactAngle property saves the target angle when the knife hits the target
+                    knife.impactAngle = this.target.angle;
 
-                //       // function to be executed once the tween has been completed
-                //       onComplete: function (tween) {
-                //           this.createTimeOut();
-                //       }
-                //   });
-              }
-              // ------------------------------------------------------------------------------
-              // player can now throw again
-              this.canThrow = true;
-              this.score++;
-              this.scoreText.setText(`Score: ${this.score}`);
-              // adding the rotating knife in the same place of the knife just landed on target
-              var knife = this.add.sprite(this.knife.x, this.knife.y, "knife");
+                    // adding the rotating knife to knifeGroup group
+                    this.knifeGroup.add(knife);
 
-              // impactAngle property saves the target angle when the knife hits the target
-              knife.impactAngle = this.target.angle;
-
-                 // adding the rotating knife to knifeGroup group
-              this.knifeGroup.add(knife);
-
-              // bringing back the knife to its starting position
-              this.knife.y = (this.world.centerY / 5) * 4;
-          }
-
-          // in case this is not a legal hit
-             else {
-            //   tween to throw the knife
-              this.tweens.add({
-                  // adding the knife to tween targets
-                  targets: [this.knife],
-
-                  // y destination
-                     y: this.world.centerY + this.knife.height,
-
-                     // rotation destination, in radians
-                     rotation: 5,
-
-                  // tween duration
-                  duration: gameOptions.throwSpeed * 4,
-
-                  // callback scope
-                     callbackScope: this,
-
-                  // function to be executed once the tween has been completed
-                  onComplete: function (tween) {
-                      // restart the game
-                      this.scene.start("PlayGame");
-                  }
-              });
-          }
-      }
-    ,this)
-   
-            // tween to throw the knife
-    // this.world.add.tween({
-    //      // adding the knife to tween targets
-    //         targets: [this.knife],
-
-    //      // y destination
-    //         y: this.target.y + this.target.width / 2,
-
-    //         // tween duration
-    //         duration: gameOptions.throwSpeed,
-
-    //         // callback scope
-    //         callbackScope: this,
-
-    //            // function to be executed once the tween has been completed
-    //         onComplete: function (tween) {
-    //                // at the moment, this is a legal hit
-    //             var legalHit = true;
-    //             console.log('throw2');
-                
-    //             // getting an array with all rotating knives
-    //             var children = this.knifeGroup.children;
-
-    //             // looping through rotating knives
-    //             for (var i = 0; i < children.length; i++) {
-    //                 // is the knife too close to the i-th knife?
-    //                 if (
-    //                     Math.abs(
-    //                         Phaser.Math.getShortestAngle(
-    //                          this.target.angle,
-    //                     )
-    //                     ) < gameOptions.minAngle
-    //              ) {
-    //                  // this is not a legal hit
-    //                  legalHit = false;
-    //                  // this.score = scores.current;
-    //                  // this.scoreText.setText(`Score: ${this.score}`);
-
-    //                     // no need to continue with the loop
-    //                     break;
-    //                 }
-
-    //             }
-    //             // is this a legal hit
-    //          if (legalHit) {
-    //                 // ----------------------   ---------------------------------------------------------------
-    //                 console.log(this.coin.hit);
-
-    //                 // console.log(Math.floor(Math.abs(Phaser.Math.getShortestAngle(this.target.angle, 190 - this.coin.startAngle))) < Math.abs(gameOptions.minAngle));
-
-    //                  if (
-    //                         Math.abs(
-    //                          Phaser.Math.getShortestAngle(
-    //                              this.target.angle,
-    //                              180 - this.coin.startAngle
-    //                          )
-    //                      ) < gameOptions.minAngle &&
-    //                      !this.coin.hit
-    //                     ) {
-    //                         // console.log('In if block  - true');
-    //                         // coin has been hit
-    //                         this.coin.hit = !this.coin.hit;
-    //                         this.softCurrency += 25;
-    //                      // console.log(this.softCurrency);
-    //                      this.coinsText.setText(`Coins: ${this.softCurrency}`);
-    //                         // change coin frame to show one slice
-    //                      this.coin.setFrame(1);
-
-    //                      // add the other coin slice in the same coin posiiton
-    //                      var slice = this.add.sprite(this.coin.x, this.coin.y, "coin", 1);
-
-    //                      // same angle too.
-    //                      slice.angle = this.coin.angle;
-
-    //                      // and same origin
-    //                         slice.setOrigin(0.5, 1);
-
-    //                      // tween to make coin slices fall down
-    //                      this.tweens.add({
-    //                          // adding the knife to tween targets
-    //                          targets: [this.coin, slice],
-
-    //                          // y destination
-    //                          y: this.world.centerY + this.coin.height,
-
-    //                          // x destination
-    //                          x: {
-    //                              // running a function to get different x ends for each slice according to frame number
-    //                              getEnd: function (target, key, value) {
-    //                                  return (
-    //                                      Phaser.Math.angleBetween(0, this.world.width / 2) +
-    //                                      (this.world.width / 2) * (target.frame.name - 1)
-    //                                  );
-    //                              }
-    //                          },
-    //                          // rotation destination, in radians
-    //                          angle: 45,
-
-    //                          // tween duration
-    //                          duration: gameOptions.throwSpeed * 6,
-
-    //                          // callback scope
-    //                          callbackScope: this,
-
-    //                          // function to be executed once the tween has been completed
-    //                          onComplete: function (tween) {
-    //                              this.createTimeOut();
-    //                          }
-    //                      });
-    //                  }
-    //                  // ------------------------------------------------------------------------------
-    //                  // player can now throw again
-    //                  this.canThrow = true;
-    //                  this.score++;
-    //                  this.scoreText.setText(`Score: ${this.score}`);
-    //                  // adding the rotating knife in the same place of the knife just landed on target
-    //                  var knife = this.add.sprite(this.knife.x, this.knife.y, "knife");
-
-    //                  // impactAngle property saves the target angle when the knife hits the target
-    //                  knife.impactAngle = this.target.angle;
-
-    //                     // adding the rotating knife to knifeGroup group
-    //                  this.knifeGroup.add(knife);
-
-    //                  // bringing back the knife to its starting position
-    //                  this.knife.y = (this.world.centerY / 5) * 4;
-    //              }
-
-    //              // in case this is not a legal hit
-    //                 else {
-    //                  // tween to throw the knife
-    //                  // this.tweens.add({
-    //                  //     // adding the knife to tween targets
-    //                  //     targets: [this.knife],
-
-    //                  //     // y destination
-    //                     //     y: this.world.centerY + this.knife.height,
-
-    //                     //     // rotation destination, in radians
-    //                     //     rotation: 5,
-
-    //                  //     // tween duration
-    //                  //     duration: gameOptions.throwSpeed * 4,
-
-    //                  //     // callback scope
-    //                     //     callbackScope: this,
-
-    //                  //     // function to be executed once the tween has been completed
-    //                  //     onComplete: function (tween) {
-    //                  //         // restart the game
-    //                  //         this.scene.start("PlayGame");
-    //                  //     }
-    //                  // });
-    //              }
-    //          }
-    //      });
-        }}
-        
+                    // bringing back the knife to its starting position
+                    this.knife.y = (this.world.height / 5) * 4;
+                }
+                // in case this is not a legal hit
+                else {
+                    console.log('Game Restart');
+                    let knifeTweenElse = this.game.add.tween(this.knife)
+                    knifeTweenElse.to({
+                        y: this.world.centerY + this.knife.height
+                    }, gameOptions.throwSpeed * 2, null, false)
+                    knifeTweenElse.onComplete.add(function (tween) {
+                        // restart the game
+                        this.state.start("Play");
+                    }, this);
+                    knifeTweenElse.start()
+                }
+            }, this) 
+            knifeThrow.start()
+        }
+    }
     // method to be executed at each frame. Please notice the arguments.
     update(time) {
-
+        if (this.game.input.activePointer.isDown) {
+            this.throwKnife()
+        }
         // rotating the target
         this.target.angle += this.currentRotationSpeed;
-
         // getting an array with all rotating knives
         var children = this.knifeGroup.children;
-        // // looping through rotating knives
-        // for (var i = 0; i < children.length; i++) {
-        //     // rotating the knife
-        //     children[i].angle += this.currentRotationSpeed;
-
-        //     // turning knife angle in radians
-        //     var radians = Phaser.Math.degToRad(children[i].angle + 90);
-
-        //     // trigonometry to make the knife rotate around target center
-        //     children[i].x =
-        //         this.target.x + (this.target.width / 2) * Math.cos(radians);
-        //     children[i].y =
-        //         this.target.y + (this.target.width / 2) * Math.sin(radians);
-        // }
+        // looping through rotating knives
+        for (var i = 0; i < children.length; i++) {
+            children[i].anchor.setTo(0.5, 0.5);
+            children[i].scale.setTo(0.5);
+            // rotating the knife
+            children[i].angle += this.currentRotationSpeed;
+            // turning knife angle in radians
+            var radians = Phaser.Math.degToRad(children[i].angle + 90);
+            // trigonometry to make the knife rotate around target center
+            children[i].x =
+                this.target.x + (this.target.width / 2) * Math.cos(radians);
+            children[i].y =
+                this.target.y + (this.target.width / 2) * Math.sin(radians);
+        }
 
         // // adjusting current rotation speed using linear interpolation
         let del = 0.3;
@@ -512,8 +323,3 @@ export default class Play extends Phaser.State {
         }
     }
 }
-
-
-
-
-

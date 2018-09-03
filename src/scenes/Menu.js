@@ -1,6 +1,4 @@
-import {
-    fail
-} from "assert";
+
 let title;
 let style = {
     fontWeight: 'bold',
@@ -9,17 +7,11 @@ let style = {
 export default class Menu extends Phaser.State {
     // method to be executed when the scene preloads
     preload() {
-        //   this.load.image("back", `${Images.ImagesChina.getPNG()}`)
-        //   this.load.image("coin", coin);
-        // this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        // this.scale.pageAlignHorizontally = true;
+
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
-        // this.canvas.style.width = '100%';
-        // this.canvas.style.height = '100%';
-        // this.scale.refresh();
-        // this.scale.pageAlignVertically = false;
+       
     }
     create() {
         //   console.log(back);
@@ -50,9 +42,7 @@ export default class Menu extends Phaser.State {
                 style
             );
         title.anchor.setTo(0.5, 0.5)
-        title.inputEnabled = true
-        title.events.onInputDown.add(this.comon, this);
-        // title.input.onTap.add(this.comon, this);
+       
         // current score
         this.currentScore = this.add
             .text(
@@ -96,8 +86,10 @@ export default class Menu extends Phaser.State {
                 this.world.centerY + 80,
                 "Settings",
                 style
-            ).anchor.setTo(0.5, 0.5);
-
+            )
+            this.options.anchor.setTo(0.5, 0.5)
+            this.options.inputEnabled = true
+            this.options.events.onInputDown.add(this.toSettings, this);
 
         // shop menu
         this.shop = this.add
@@ -106,8 +98,10 @@ export default class Menu extends Phaser.State {
                 this.world.centerY + 120,
                 "Knife Collection",
                 style
-            ).anchor.setTo(0.5, 0.5);
-
+            );
+            this.shop.anchor.setTo(0.5, 0.5);
+            this.shop.inputEnabled = true;
+            this.shop.events.onInputDown.add(this.toShop, this);
         // Button play
         this.btn = this.add
             .text(
@@ -115,12 +109,23 @@ export default class Menu extends Phaser.State {
                 this.world.centerY + 160,
                 "Play",
                 style
-            ).anchor.setTo(0.5, 0.5);
-    }
+            );
+            this.btn.anchor.setTo(0.5, 0.5);
+            this.btn.inputEnabled = true;
+            this.btn.events.onInputDown.add(this.startGame, this);
+    }   
 
-    comon(item) {
+    startGame() {
         // console.log(item);
         this.state.start('Play')
 
+    }
+    toSettings(item) {
+        // console.log(item);
+        this.state.start('Settings')
+
+    }
+    toShop(){
+        this.state.start('Weapons')
     }
 }

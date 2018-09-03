@@ -18,6 +18,7 @@ module.exports = {
         path: dist,
         filename: 'game.js'
     },
+    devtool:'eval',
     resolve: {
         alias: {
             pixi: path.join(__dirname, 'node_modules/phaser-ce/build/custom/pixi.js'),
