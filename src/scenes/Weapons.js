@@ -43,23 +43,28 @@ export default class Weapons extends Phaser.State {
 
         this.knifeStore = [{
                 key: 'knife1',
-                text: 'Jomolungma'
+                text: 'Jomolungma',
+                price:`100 castars`
             },
             {
                 key: 'knife2',
-                text: 'Kilimanjaro'
+                text: 'Kilimanjaro',
+                price:`100 castars`
             },
             {
                 key: 'knife3',
-                text: 'Mont Blanc'
+                text: 'Mont Blanc',
+                price:`100 castars`
             },
             {
                 key: 'knife4',
-                text: 'Hoverla'
+                text: 'Hoverla',
+                price:`100 castars`
             },
             {
                 key: 'knife5',
-                text: 'HUAYNA PICCHU'
+                text: 'HUAYNA PICCHU',
+                price:`100 castars`
             }
         ]
 
@@ -69,10 +74,13 @@ export default class Weapons extends Phaser.State {
             knifeItem =  this.knifes.create(-1000,this.game.world.centerY,el.key);
             knifeItem.anchor.setTo(0.5);
             knifeItem.scale.setTo(0.7);
-            knifeItem.customParam = {text:el.text};
+            knifeItem.customParams = {text:el.text,price:el.price};
         })
         this.currentKnife = this.knifes.next();
         this.currentKnife.position.set(this.game.world.centerX,this.game.world.centerY);
+
+        // text
+        this.showText(this.currentKnife)
 
 // Left Arrow for switching
         this.leftArrow = this.game.add.sprite(60, this.world.centerY, 'arrow');
@@ -100,26 +108,48 @@ export default class Weapons extends Phaser.State {
 
     switchKnife(sprite,event) {
         console.log('Asd');
+        this.knifeText.visible = false;
+        this.knifePrice.visible = false;
        var newKnife,endX;
        if(sprite.customParams.direction > 0){
         newKnife = this.knifes.next();
+        newKnife.x= -newKnife/2;
         endX =this.game.world.width + this.currentKnife.width /2;
        }
        else {
         newKnife = this.knifes.previous()
+        newKnife.x=640+ newKnife/2;
         endX =-this.currentKnife.width/2;
        }
 
-       this.currentKnife.x = endX;
-       newKnife.x = this.game.world.centerX;
-    //    let newKnifeMove = this.game.add.tween(newKnife);
-    //    newKnifeMove.to({x:this.game.world.centerX},640);
-    //    newKnifeMove.start();
+    //    this.currentKnife.x = endX;
+    //    newKnife.x = this.game.world.centerX;
+    // -------test tween
+       let newKnifeMove = this.game.add.tween(newKnife);
+       newKnifeMove.to({x:this.game.world.centerX},500);
+       newKnifeMove.onComplete.add(function(){
+        this.showText(this.currentKnife)
+       },this)
+       newKnifeMove.start();
 
-    //    let currentKnifeMove = this.game.add.tween(newKnife);
-    //    currentKnifeMove.to({x:endX},640);
-    //    currentKnifeMove.start();
+       let currentKnifeMove = this.game.add.tween(this.currentKnife);
+       currentKnifeMove.to({x:endX},500);
+       currentKnifeMove.start();
 
        this.currentKnife = newKnife;
+    }
+    showText(knife){
+        if(!this.knifeText && !this.knifePrice){
+            this.knifeText = this.game.add.text(this.game.width /2,this.game.height*0.85,'',style);
+            this.knifeText.anchor.setTo(0.5)
+
+            this.knifePrice = this.game.add.text(this.game.width /2,this.game.height*0.89,'',style);
+            this.knifePrice.anchor.setTo(0.5)
+
+        }
+        this.knifeText.setText(knife.customParams.text);
+        this.knifeText.visible = true;
+        this.knifePrice.setText(knife.customParams.price);
+        this.knifePrice.visible = true;
     }
 }
