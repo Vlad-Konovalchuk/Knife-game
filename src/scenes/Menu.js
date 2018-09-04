@@ -22,7 +22,7 @@ export default class Menu extends Phaser.State {
         //   }
         // }).catch(error => console.error(error));
         this.load.crossOrigin = 'anonymous'
-        this.load.image('profile',userData.playerPic)
+        // this.load.image('profile',userData.playerPic)
        
     }
     create() {
@@ -57,12 +57,12 @@ export default class Menu extends Phaser.State {
                 style
             );
         title.anchor.setTo(0.5, 0.5)
-       this.userName = this.add.text(this.world.centerX,this.world.centerY - 250,`Welcome ${userData.playerName}`,style);
-       this.userName.anchor.setTo(0.5);
-       this.userLogo = this.add.image(this.world.centerX,this.world.centerY - 190,'profile');
-        this.userLogo.anchor.set(0.5);
-        this.userLogo.width = 100;
-        this.userLogo.height = 100;
+    //    this.userName = this.add.text(this.world.centerX,this.world.centerY - 250,`Welcome ${userData.playerName}`,style);
+    //    this.userName.anchor.setTo(0.5);
+    //    this.userLogo = this.add.image(this.world.centerX,this.world.centerY - 190,'profile');
+    //     this.userLogo.anchor.set(0.5);
+    //     this.userLogo.width = 100;
+    //     this.userLogo.height = 100;
         // current score
         this.currentScore = this.add
             .text(
@@ -77,7 +77,7 @@ export default class Menu extends Phaser.State {
             .text(
                 this.world.centerX,
                 this.world.centerY - 40,
-                `BEST SCORE:${userData.playerId}`,
+                `BEST SCORE:0`,
                 style
             ).anchor.setTo(0.5, 0.5);
 
@@ -97,8 +97,12 @@ export default class Menu extends Phaser.State {
                 this.world.centerY + 40,
                 "Leader Board",
                 style
-            ).anchor.setTo(0.5, 0.5);
+            )
+            this.leaders.anchor.setTo(0.5, 0.5)
+            this.leaders.inputEnabled = true
+            this.leaders.events.onInputDown.add(this.toLeaderBoard, this);
 
+            
         // options menu
         this.options = this.add
             .text(
@@ -147,5 +151,8 @@ export default class Menu extends Phaser.State {
     }
     toShop(){
         this.state.start('Weapons')
+    }
+    toLeaderBoard(){
+        this.state.start('Leaders')
     }
 }

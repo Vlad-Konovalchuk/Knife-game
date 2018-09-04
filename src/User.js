@@ -1,7 +1,8 @@
 let userData = {
     playerName:null,
     playerPic:null,
-    playerId:null
+    playerId:null,
+    friends:null
 }
 
 
