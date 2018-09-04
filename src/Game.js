@@ -9,16 +9,18 @@ import Weapons from './scenes/Weapons';
 
   class Game extends Phaser.Game{
       constructor(){
-          const width = '100%';
-          const height = '100%';
+          const width = 700;
+          const height = 1100;
           const config = {
               height,
               width,
-              backgroundColor:'#00ff00',
+              backgroundColor:'#000',
               type:Phaser.CANVAS
           }
-          super('100%','100%',Phaser.AUTO)
-        //   this.input.addPointer()
+          super(config)
+        //   this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE ,
+        //   this.scale.pageAlignHorizontally = true,
+        //   this.scale.pageAlignVertically = true,
           this.state.add('Menu',Menu);
           this.state.add('Play',Play)
           this.state.add('Settings',Settings)
@@ -26,6 +28,11 @@ import Weapons from './scenes/Weapons';
           this.state.add('Weapons',Weapons)
 
           this.state.start('Menu')
+     
+
       }
   }
-  new Game ()
+function startGame(){
+    new Game ()
+}
+startGame()

@@ -8,12 +8,13 @@ export default class Menu extends Phaser.State {
     // method to be executed when the scene preloads
     preload() {
 
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.scale.pageAlignHorizontally = true;
-        this.scale.pageAlignVertically = true;
+
        
     }
     create() {
+        this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT  ;
+        this.scale.pageAlignHorizontally = true; 
+        this.scale.pageAlignVertically = true;
         //   console.log(back);
         // this.add
         //   .image(this.world.centerX + 40, this.world.centerY, "back")
