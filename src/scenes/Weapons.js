@@ -26,10 +26,13 @@ export default class Weapons extends Phaser.State {
 
     }
     create() {
+        this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT  ;
+        this.scale.pageAlignHorizontally = true; 
+        this.scale.pageAlignVertically = true;
         this.title = this.add
             .text(
                 this.world.centerX,
-                this.world.centerY - 350,
+                this.world.centerY - 400,
                 "Back to Menu",
                 style
             );
@@ -83,24 +86,24 @@ export default class Weapons extends Phaser.State {
         this.showText(this.currentKnife)
 
 // Left Arrow for switching
-        this.leftArrow = this.game.add.sprite(60, this.world.centerY, 'arrow');
+        this.leftArrow = this.game.add.sprite(this.world.centerX-290, this.world.centerY, 'arrow');
         this.leftArrow.anchor.setTo(0.5);
         this.leftArrow.scale.setTo(-0.2);
         this.leftArrow.customParams = { direction: -1};
         // Arrow input
         this.leftArrow.inputEnabled = true;
-        this.leftArrow.input.pixelPerfectClick = true;
+        // this.leftArrow.input.pixelPerfectClick = true;
         this.leftArrow.events.onInputDown.add(this.switchKnife, this);
 
 
 // Right Arrow for switching
-        this.rightArrow = this.game.add.sprite(310, this.world.centerY, 'arrow');
+        this.rightArrow = this.game.add.sprite(this.world.centerX+290, this.world.centerY, 'arrow');
         this.rightArrow.anchor.setTo(0.5);
         this.rightArrow.scale.setTo(0.2);
         this.rightArrow.customParams = {direction: 1};
         // Arrow input
         this.rightArrow.inputEnabled = true;
-        this.rightArrow.input.pixelPerfectClick = true;
+        // this.rightArrow.input.pixelPerfectClick = true;
         this.rightArrow.events.onInputDown.add(this.switchKnife, this);
 
 
@@ -140,10 +143,10 @@ export default class Weapons extends Phaser.State {
     }
     showText(knife){
         if(!this.knifeText && !this.knifePrice){
-            this.knifeText = this.game.add.text(this.game.width /2,this.game.height*0.85,'',style);
+            this.knifeText = this.game.add.text(this.game.width /2,this.game.height*0.70,'',style);
             this.knifeText.anchor.setTo(0.5)
 
-            this.knifePrice = this.game.add.text(this.game.width /2,this.game.height*0.89,'',style);
+            this.knifePrice = this.game.add.text(this.game.width /2,this.game.height*0.75,'',style);
             this.knifePrice.anchor.setTo(0.5)
 
         }

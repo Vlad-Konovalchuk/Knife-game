@@ -14,8 +14,8 @@ let style = {
 export default class Settings extends Phaser.State {
     // method to be executed when the scene preloads
     preload() {
-        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        this.scale.pageAlignHorizontally = true;
+        this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT  ;
+        this.scale.pageAlignHorizontally = true; 
         this.scale.pageAlignVertically = true;
 
     }

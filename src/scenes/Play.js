@@ -45,30 +45,37 @@ export default class Play extends Phaser.State {
         this.load.spritesheet("coin", coin, 70, 96);
     }
     create() {
-        this.score=0;
+        this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+        this.scale.pageAlignHorizontally = true;
+        this.scale.pageAlignVertically = true;
+        this.score = 0;
         console.log('start ');
         this.target = this.add.sprite(this.world.width / 2, 300, 'target')
         this.target.anchor.setTo(0.5, 0.5);
         this.target.scale.setTo(0.5)
 
         this.scoreText = this.add.text(
-            10,
-            10,
+            this.world.centerX - 250,
+            45,
             `Score: ${this.score}`, style
         );
+        this.scoreText.anchor.setTo(0.5)
         this.coinsText = this.add.text(
-            250,
-            this.world.top,
+            this.world.centerX + 250,
+            45,
             `Coins: 0`, style
         );
-        this.pauseBtn = this.add.text(20,(this.world.centerY+200), "Pause",style)
+        this.coinsText.anchor.setTo(0.5)
+        this.pauseBtn = this.add.text(this.world.centerX - 250, (this.world.centerY + 450), "Pause", style);
+        this.pauseBtn.anchor.setTo(0.5);
         this.pauseBtn.inputEnabled = true;
         this.pauseBtn.events.onInputDown.add(() => {
             this.game.paused = !this.game.paused;
         }, this);
 
 
-        this.exitBtn = this.add.text(250,(this.world.centerY+200), "Exit",style)
+        this.exitBtn = this.add.text(this.world.centerX + 250, (this.world.centerY + 450), "Exit", style);
+        this.exitBtn.anchor.setTo(0.5);
         this.exitBtn.inputEnabled = true;
         this.exitBtn.events.onInputDown.add(() => {
             this.state.start('Menu')
@@ -159,7 +166,6 @@ export default class Play extends Phaser.State {
         this.coin.depth = 2;
         this.coin.hit = false;
         this.coin.angle = coinAngle;
-
         // saving coin start angle
         this.coin.startAngle = coinAngle;
 
@@ -177,7 +183,7 @@ export default class Play extends Phaser.State {
             let knifeThrow = this.game.add.tween(this.knife)
             knifeThrow.to({
                 y: this.target.y + this.target.width / 2
-            }, gameOptions.throwSpeed * 2, null, false)
+            }, gameOptions.throwSpeed * 2)
             knifeThrow.onComplete.add(function throwCallback(tween) {
                 console.log('Callback');
 
@@ -228,20 +234,21 @@ export default class Play extends Phaser.State {
 
                         // and same origin
                         slice.anchor.setTo(0.5, 1);
-                        
+
                         // tween to make coin slices fall down
                         let sliceCoin = this.game.add.tween(this.coin, slice)
                         sliceCoin.to({
-                                y: this.game.height + this.coin.height,
-                                // x destination
-                                x: {
-   // running a function to get different x ends for each slice according to frame number
+                            y: this.game.height + this.coin.height,
+                            // x destination
+                            x: {
+                                // running a function to get different x ends for each slice according to frame number
                                 getEnd: function (target, key, value) {
-                                    return Phaser.Math.Between(0, this.world.width / 2) + (this.world.width / 2 * (target.frame - 1));}
+                                    return Phaser.Math.Between(0, this.world.width / 2) + (this.world.width / 2 * (target.frame - 1));
                                 }
-                            },gameOptions.throwSpeed * 6,Phaser.Easing.Linear.None,false,2000)
+                            }
+                        }, gameOptions.throwSpeed * 6, Phaser.Easing.Linear.None, false, 2000)
                         sliceCoin.onComplete.add(function coinTweenCallback(tween) {
-                        this.state.start("Play")
+                            this.state.start("Play")
                         }, this)
                         sliceCoin.start()
                     }
@@ -252,7 +259,8 @@ export default class Play extends Phaser.State {
                     console.log('Score', this.score);
                     this.scoreText.setText(`Score: ${this.score}`)
                     // adding the rotating knife in the same place of the knife just landed on target
-                    var knife = this.add.sprite(this.knife.x, this.knife.y, "weapon");
+                    var knife = this.add.sprite(this.world.width / 2,
+                        (this.world.height / 5) * 4, "weapon");
 
                     // impactAngle property saves the target angle when the knife hits the target
                     knife.impactAngle = this.target.angle;
@@ -271,12 +279,20 @@ export default class Play extends Phaser.State {
                         y: this.world.centerY + this.knife.height
                     }, gameOptions.throwSpeed * 2, null, false)
                     knifeTweenElse.onComplete.add(function (tween) {
+                        FBInstant
+                            .getLeaderboardAsync('my_awesome_leaderboard.' + context.getID())
+                            .then(leaderboard => {
+                                console.log(leaderboard.getName());
+                                return leaderboard.setScoreAsync(this.score, '{race: "elf", level: 3}');
+                            })
+                            .then(() => console.log('Score saved'))
+                            .catch(error => console.error(error));
                         // restart the game
                         this.state.start("Play");
                     }, this);
                     knifeTweenElse.start()
                 }
-            }, this) 
+            }, this)
             knifeThrow.start()
         }
     }
