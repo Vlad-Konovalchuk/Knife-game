@@ -279,14 +279,6 @@ export default class Play extends Phaser.State {
                         y: this.world.centerY + this.knife.height
                     }, gameOptions.throwSpeed * 2, null, false)
                     knifeTweenElse.onComplete.add(function (tween) {
-                        FBInstant
-                            .getLeaderboardAsync('my_awesome_leaderboard.' + context.getID())
-                            .then(leaderboard => {
-                                console.log(leaderboard.getName());
-                                return leaderboard.setScoreAsync(this.score, '{race: "elf", level: 3}');
-                            })
-                            .then(() => console.log('Score saved'))
-                            .catch(error => console.error(error));
                         // restart the game
                         this.state.start("Play");
                     }, this);
