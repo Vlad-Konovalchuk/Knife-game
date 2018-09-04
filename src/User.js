@@ -1,9 +1,9 @@
 let userData = {
-    playerName:null,
-    playerPic:null,
-    playerId:null,
-    friends:null
+    playerName: null,
+    playerPic: null,
+    playerId: null,
+    friends: null
 }
 
 
-export default  userData;
+export default userData;

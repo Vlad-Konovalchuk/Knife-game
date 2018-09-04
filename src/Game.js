@@ -7,7 +7,7 @@ import Settings from './scenes/Settings';
 import Leaders from './scenes/Leaders';
 import Weapons from './scenes/Weapons';
 import userData from './User'
-let user=null;
+let user = null;
 class Game extends Phaser.Game {
     constructor() {
         const width = 700;
@@ -39,10 +39,10 @@ class User {
         this.playerPic = userInstant.player.getPhoto();
         this.friends = userInstant.player.getConnectedPlayersAsync()
     }
-    show(){
-        console.log('al list',this.friends);
-        console.log('q',this.friends._value);
-            
+    show() {
+        console.log('al list', this.friends);
+        console.log('q', this.friends._value);
+
     }
 
 }
@@ -51,24 +51,19 @@ class User {
 async function getFB() {
     try {
         await FBInstant.initializeAsync()
-         FBInstant.startGameAsync().then(function(){
+        FBInstant.startGameAsync().then(function () {
             console.log('Game Start');
-            // let friends = await getFriends();
             user = new User(FBInstant);
-            user.show();
-            console.log('user', user);
-            // console.log('friends', user.friends);
-            // console.log('q', user.friends.q);
-            // console.log('value', user.friends._value);
             new Game()
-         })
-         }
-    catch (error) {
+        })
+    } catch (error) {
         console.log(error);
     }
 }
 
-export {user};
+export {
+    user
+};
 
 
 getFB()

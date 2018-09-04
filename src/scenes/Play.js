@@ -33,9 +33,7 @@ let style = {
     fontWeight: 'bold',
     fill: '#fff'
 };
-
 export default class Play extends Phaser.State {
-
     // method to be executed when the scene preloads
     preload() {
         // loading assets
