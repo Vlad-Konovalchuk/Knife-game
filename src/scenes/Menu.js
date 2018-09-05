@@ -1,54 +1,34 @@
-import userData from '../User'
-
-let title;
+import {user} from '../Game'
+import {getFB} from '../Game'
 let style = {
     fontWeight: 'bold',
     fill: '#fff'
 };
+
+
 export default class Menu extends Phaser.State {
     // method to be executed when the scene preloads
+    // init(){
+    //     user.getActualScore();
+    //     this.points = user.current;
+    //     this.state.update();
+    // }
+    // }
     preload() {
-
-        // FBInstant
-        // .getLeaderboardAsync('leader_of_knifes.' + FBInstant.context.getID())
-        // .then(leaderboard => leaderboard.getEntriesAsync(10, 0))
-        // .then(entries => {
-        //   for (var i = 0; i < entries.length; i++) {
-        //     console.log(
-        //       entries[i].getRank() + '. ' +
-        //       entries[i].getPlayer().getName() + ': ' +
-        //       entries[i].getScore()
-        //     );
-        //   }
-        // }).catch(error => console.error(error));
+        user.getActualScore();
+        this.state.restart();
+        this.points = user.current;
         this.load.crossOrigin = 'anonymous'
-        // this.load.image('profile',userData.playerPic)
-       
+        this.load.image('profile',user.playerPic)
     }
     create() {
+        this.state.update();
+        user.getActualScore();
+        this.points = user.current;
         this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT  ;
         this.scale.pageAlignHorizontally = true; 
         this.scale.pageAlignVertically = true;
-        //   console.log(back);
-        // this.add
-        //   .image(this.world.centerX + 40, this.world.centerY, "back")
-        //   .setOrigin(1)
-        //   .setScale(1);
-
-        //   const menuConfig = [
-        //     {template: '', is_interactive: false, handler: null}
-        //   ]
-
-        //   function addMenuItem(menuItem) {
-        //     this.title = this.add
-        //     .text(
-        //       this.world.centerX / 2,
-        //       this.world.centerY-1500,
-        //       "Drop the Knife",
-        //       style.title
-        //     )
-        //     .setOrigin(0.5);
-        //   }
+        console.log('user', user);
         let title = this.add
             .text(
                 this.world.centerX,
@@ -57,18 +37,19 @@ export default class Menu extends Phaser.State {
                 style
             );
         title.anchor.setTo(0.5, 0.5)
-    //    this.userName = this.add.text(this.world.centerX,this.world.centerY - 250,`Welcome ${userData.playerName}`,style);
-    //    this.userName.anchor.setTo(0.5);
-    //    this.userLogo = this.add.image(this.world.centerX,this.world.centerY - 190,'profile');
-    //     this.userLogo.anchor.set(0.5);
-    //     this.userLogo.width = 100;
-    //     this.userLogo.height = 100;
+       this.userName = this.add.text(this.world.centerX,this.world.centerY - 250,`Welcome ${user.playerName}`,style);
+       this.userName.anchor.setTo(0.5);
+       this.userLogo = this.add.image(this.world.centerX,this.world.centerY - 190,'profile');
+        this.userLogo.anchor.set(0.5);
+        this.userLogo.width = 100;
+        this.userLogo.height = 100;
+
         // current score
         this.currentScore = this.add
             .text(
                 this.world.centerX,
                 this.world.centerY - 80,
-                `Score: 0`,
+                `Score:${this.points}`,
                 style
             ).anchor.setTo(0.5, 0.5);
 
@@ -77,7 +58,7 @@ export default class Menu extends Phaser.State {
             .text(
                 this.world.centerX,
                 this.world.centerY - 40,
-                `BEST SCORE:0`,
+                `BEST SCORE:${user.best}`,
                 style
             ).anchor.setTo(0.5, 0.5);
 
@@ -138,7 +119,7 @@ export default class Menu extends Phaser.State {
             this.btn.inputEnabled = true;
             this.btn.events.onInputDown.add(this.startGame, this);
     }   
-
+  
     startGame() {
         // console.log(item);
         this.state.start('Play')

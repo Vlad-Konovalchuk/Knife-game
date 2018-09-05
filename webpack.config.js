@@ -1,4 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WebpackCleanupPlugin = require('webpack-cleanup-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 const dist = path.resolve(__dirname, 'dist');
@@ -60,5 +62,11 @@ module.exports = {
     plugins: [new HtmlWebpackPlugin({
         inject: true,
         template: 'public/index.html'
-    })]
+    }),
+    new ZipPlugin({
+        
+        filename:'fbGame.zip'
+    }),
+    new WebpackCleanupPlugin()
+]
 };

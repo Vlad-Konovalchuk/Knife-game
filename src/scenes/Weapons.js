@@ -6,7 +6,6 @@ import knife5 from "../../assets/knife5.png";
 import arrow from "../../assets/arrow2.png";
 
 
-let title;
 let style = {
     fontWeight: 'bold',
     fill: '#fff'
@@ -110,7 +109,7 @@ export default class Weapons extends Phaser.State {
     }
 
     switchKnife(sprite,event) {
-        console.log('Asd');
+
         this.knifeText.visible = false;
         this.knifePrice.visible = false;
        var newKnife,endX;
@@ -121,13 +120,10 @@ export default class Weapons extends Phaser.State {
        }
        else {
         newKnife = this.knifes.previous()
-        newKnife.x=640+ newKnife/2;
+        newKnife.x=newKnife/2;
         endX =-this.currentKnife.width/2;
        }
 
-    //    this.currentKnife.x = endX;
-    //    newKnife.x = this.game.world.centerX;
-    // -------test tween
        let newKnifeMove = this.game.add.tween(newKnife);
        newKnifeMove.to({x:this.game.world.centerX},500);
        newKnifeMove.onComplete.add(function(){

@@ -6,8 +6,11 @@ import Play from './scenes/Play';
 import Settings from './scenes/Settings';
 import Leaders from './scenes/Leaders';
 import Weapons from './scenes/Weapons';
-import userData from './User'
+
+
 let user = null;
+
+
 class Game extends Phaser.Game {
     constructor() {
         const width = 700;
@@ -19,9 +22,6 @@ class Game extends Phaser.Game {
             type: Phaser.CANVAS
         }
         super(config)
-        //   this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE ,
-        //   this.scale.pageAlignHorizontally = true,
-        //   this.scale.pageAlignVertically = true,
         this.state.add('Menu', Menu);
         this.state.add('Play', Play);
         this.state.add('Settings', Settings);
@@ -34,28 +34,39 @@ class Game extends Phaser.Game {
 }
 
 class User {
-    constructor(userInstant) {
-        this.playerName = userInstant.player.getName();
-        this.playerPic = userInstant.player.getPhoto();
-        this.friends = userInstant.player.getConnectedPlayersAsync()
+    constructor(response) {
+        this.playerName = response[0];
+        this.playerPic = response[1];
+        this.friends = response[2].map(item => {
+            return item.$1.name
+        });
+        this.current = response[3].current;
+        this.best = response[3].best;
     }
-    show() {
-        console.log('al list', this.friends);
-        console.log('q', this.friends._value);
-
+    async getActualScore (){
+        const response = await FBInstant.player.getDataAsync(['current', 'best']);
+        console.log('Actual Store', response);
+        this.current = response.current;
+        this.best = response.best;
     }
 
 }
 
-
 async function getFB() {
     try {
-        await FBInstant.initializeAsync()
-        FBInstant.startGameAsync().then(function () {
-            console.log('Game Start');
-            user = new User(FBInstant);
-            new Game()
-        })
+        await FBInstant.initializeAsync();
+        await FBInstant.startGameAsync();
+        const response = await Promise.all([
+            FBInstant.player.getName(),
+            FBInstant.player.getPhoto(),
+            FBInstant.player.getConnectedPlayersAsync(),
+            FBInstant.player.getDataAsync(['current', 'best']),
+        ]);
+        
+        console.log(response);
+        user = new User(response);
+        new Game()
+        
     } catch (error) {
         console.log(error);
     }
@@ -64,6 +75,4 @@ async function getFB() {
 export {
     user
 };
-
-
 getFB()
