@@ -4,7 +4,20 @@ import knife3 from "../../assets/knife3.png";
 import knife4 from "../../assets/knife4.png";
 import knife5 from "../../assets/knife5.png";
 import arrow from "../../assets/arrow2.png";
+import UserWeapon from './UserWeapon'
 
+
+
+class  Knife{
+    constructor(path){
+    this.path = path
+    }
+}
+const Jomolungma = new Knife("assets/knife.png");
+const MontBlanc = new Knife("assets/knife3.png");
+const Hoverla = new Knife("assets/knife4.png");
+const Fuji = new Knife("assets/knife5.png");
+const Kilimanjaro = new Knife("assets/knife2.png");
 
 let style = {
     fontWeight: 'bold',
@@ -45,28 +58,38 @@ export default class Weapons extends Phaser.State {
 
         this.knifeStore = [{
                 key: 'knife1',
+                class:Jomolungma.path,
                 text: 'Jomolungma',
-                price:`100 castars`
+                price:`100 castars`,
+                path:"assets/knife.png"
             },
             {
                 key: 'knife2',
                 text: 'Kilimanjaro',
-                price:`100 castars`
+                class:Kilimanjaro.path,
+                price:`100 castars`,
+                path:"assets/knife2.png"
             },
             {
                 key: 'knife3',
                 text: 'Mont Blanc',
-                price:`100 castars`
+                class:MontBlanc.path,
+                price:`100 castars`,
+                path:"assets/knife3.png"
             },
             {
                 key: 'knife4',
                 text: 'Hoverla',
-                price:`100 castars`
+                class:Hoverla.path,
+                price:`100 castars`,
+                path:"assets/knife4.png"
             },
             {
                 key: 'knife5',
-                text: 'HUAYNA PICCHU',
-                price:`100 castars`
+                text: 'Fuji',
+                class:Fuji.path,
+                price:`100 castars`,
+                path:"assets/knife5.png"
             }
         ]
 
@@ -76,7 +99,7 @@ export default class Weapons extends Phaser.State {
             knifeItem =  this.knifes.create(-1000,this.game.world.centerY,el.key);
             knifeItem.anchor.setTo(0.5);
             knifeItem.scale.setTo(0.7);
-            knifeItem.customParams = {text:el.text,price:el.price};
+            knifeItem.customParams = {key:el.key,class:el.class,text:el.text,price:el.price};
         })
         this.currentKnife = this.knifes.next();
         this.currentKnife.position.set(this.game.world.centerX,this.game.world.centerY);
@@ -111,7 +134,9 @@ export default class Weapons extends Phaser.State {
     switchKnife(sprite,event) {
 
         this.knifeText.visible = false;
+   
         this.knifePrice.visible = false;
+
        var newKnife,endX;
        if(sprite.customParams.direction > 0){
         newKnife = this.knifes.next();
@@ -141,14 +166,28 @@ export default class Weapons extends Phaser.State {
         if(!this.knifeText && !this.knifePrice){
             this.knifeText = this.game.add.text(this.game.width /2,this.game.height*0.70,'',style);
             this.knifeText.anchor.setTo(0.5)
+            this.knifeText.inputEnabled = true
+            this.knifeText.events.onInputDown.add(this.setKnife, this);
 
             this.knifePrice = this.game.add.text(this.game.width /2,this.game.height*0.75,'',style);
             this.knifePrice.anchor.setTo(0.5)
+            this.knifePrice.inputEnabled = true
+            this.knifePrice.events.onInputDown.add(this.setKnife, this);
 
         }
         this.knifeText.setText(knife.customParams.text);
         this.knifeText.visible = true;
         this.knifePrice.setText(knife.customParams.price);
         this.knifePrice.visible = true;
+    }
+    setKnife(){
+        UserWeapon.knife = this.currentKnife.customParams.class
+
+        FBInstant.player
+        .setDataAsync({
+          currentKnife:this.currentKnife.customParams.class,
+          
+        })
+        
     }
 }

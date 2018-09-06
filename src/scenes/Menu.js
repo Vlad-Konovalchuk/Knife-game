@@ -1,5 +1,5 @@
-import {user} from '../Game'
-import {getFB} from '../Game'
+import {user} from '../Game';
+
 let style = {
     fontWeight: 'bold',
     fill: '#fff'
@@ -8,23 +8,16 @@ let style = {
 
 export default class Menu extends Phaser.State {
     // method to be executed when the scene preloads
-    // init(){
-    //     user.getActualScore();
-    //     this.points = user.current;
-    //     this.state.update();
-    // }
-    // }
     preload() {
-        user.getActualScore();
-        this.state.restart();
-        this.points = user.current;
+        // this.cache.destroy();
+        // this.cache.removeText(this.currentScore);
+        // this.cache.removeText(this.bestScore);
+        // this.state.update();
+        // user.getActualScore();
         this.load.crossOrigin = 'anonymous'
         this.load.image('profile',user.playerPic)
     }
     create() {
-        this.state.update();
-        user.getActualScore();
-        this.points = user.current;
         this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT  ;
         this.scale.pageAlignHorizontally = true; 
         this.scale.pageAlignVertically = true;
@@ -49,7 +42,7 @@ export default class Menu extends Phaser.State {
             .text(
                 this.world.centerX,
                 this.world.centerY - 80,
-                `Score:${this.points}`,
+                `Score:${user.current}`,
                 style
             ).anchor.setTo(0.5, 0.5);
 

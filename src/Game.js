@@ -72,7 +72,7 @@ async function getFB() {
     }
 }
 
-export {
-    user
-};
+export {user};
+
+
 getFB()

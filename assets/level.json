@@ -1,6 +1,5 @@
-{
-   "level":{
-    "rotationSpeed": "3",
+{"level1":{
+    "rotationSpeed": "2",
   
     "throwSpeed": "150",
   
@@ -9,46 +8,47 @@
     "rotationVariation": "2",
   
     "changeTime": "2000",
+  
+    "maxRotationSpeed": "4"
+   },
+   "level2":{
+    "rotationSpeed": "3",
+  
+    "throwSpeed": "150",
+  
+    "minAngle": "20",
+  
+    "rotationVariation": "2",
+  
+    "changeTime": "2500",
+  
+    "maxRotationSpeed": "5"
+   },
+   "level3":{
+    "rotationSpeed": "4",
+  
+    "throwSpeed": "150",
+  
+    "minAngle": "22",
+  
+    "rotationVariation": "2",
+  
+    "changeTime": "1500",
   
     "maxRotationSpeed": "6"
    },
-   "level-2":{
-    "rotationSpeed": "3",
+   "level4":{
+    "rotationSpeed": "5",
   
     "throwSpeed": "150",
   
-    "minAngle": "15",
+    "minAngle": "24",
   
     "rotationVariation": "2",
   
     "changeTime": "2000",
   
-    "maxRotationSpeed": "6"
-   },
-   "level-3":{
-    "rotationSpeed": "3",
-  
-    "throwSpeed": "150",
-  
-    "minAngle": "15",
-  
-    "rotationVariation": "2",
-  
-    "changeTime": "2000",
-  
-    "maxRotationSpeed": "6"
-   },
-   "level-4":{
-    "rotationSpeed": "3",
-  
-    "throwSpeed": "150",
-  
-    "minAngle": "15",
-  
-    "rotationVariation": "2",
-  
-    "changeTime": "2000",
-  
-    "maxRotationSpeed": "6"
+    "maxRotationSpeed": "7"
    }
   }
+
