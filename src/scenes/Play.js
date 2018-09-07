@@ -1,75 +1,64 @@
-import UserWeapon from './UserWeapon'
+import { UserWeapon } from "./UserWeapon";
 import back from "../../assets/china.png";
 // import knife1 from "../../assets/knife.png";
-import knife2 from "../../assets/knife2.png";
-import knife3 from "../../assets/knife3.png";
-import knife4 from "../../assets/knife4.png";
-import knife5 from "../../assets/knife5.png";
-import item1 from "../../assets/item1.png";
+// import knife2 from "../../assets/knife2.png";
+// import knife3 from "../../assets/knife3.png";
+// import knife4 from "../../assets/knife4.png";
+// import knife5 from "../../assets/knife5.png";
 import arrow2 from "../../assets/arrow2.png";
 import coin from "../../assets/apple.png";
 import { user } from "../Game";
-import targets from './UserWeapon'
+import { targets } from "./UserWeapon";
 import level from "../../assets/level.json";
-
-
 
 let playerScore = {
   bestScore: 0
 };
 
-// global game options
-let gameOptions = {
-  // target rotation speed, in degrees per frame
-  rotationSpeed: 5,
-
-  // knife throwing duration, in milliseconds
-  throwSpeed: 150,
-
-  // minimum angle angleBetween two knives
-  minAngle: 19,
-
-  // max rotation speed variation, in degrees per frame
-  rotationVariation: 2,
-
-  // interval before next rotation speed variation, in milliseconds
-  changeTime: 2000,
-
-  // maximum rotation speed, in degrees per frame
-  maxRotationSpeed: 9
-};
 let style = {
   fontWeight: "bold",
   fill: "#fff"
 };
+
 let currentLevel;
+let enemyCounter;
+getUserData()
 export default class Play extends Phaser.State {
   // method to be executed when the scene preloads
   preload() {
-    console.log(UserWeapon);
-    
-    this.getUserData()
+    // this.getUserData();
+    // console.log(UserWeapon);
+    // console.log(targets);
+    // console.log("levels", level);
+    // this.getUserData();
+
+    this.enemyGroup = [
+      targets.wooden,
+      targets.bear,
+      targets.celts,
+      targets.north
+    ];
+    this.enemy = this.enemyGroup[enemyCounter||0];
+    console.log("------------------------------------------------------------------");
+    console.log('curent', enemyCounter);
+    console.log(this.enemyGroup);
+    console.log(this.enemy);
+    console.log("------------------------------------------------------------------");
     // loading assets
-    this.load.image("target", targets.wooden.viewPath);
-    this.load.image("weapon", UserWeapon.knife);
+    this.load.image("target", this.enemy.viewPath);
+    this.load.image("weapon", UserWeapon.knife || "");
     this.load.image("arrow", arrow2);
     this.load.spritesheet("coin", coin, 70, 96);
-    // this.load.text('levelData',level)
   }
   create() {
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
     this.score = 0;
-    console.log("Start Play ");
-    this.levelGroup = [level.level1,level.level2,level.level3,level.level4];
+    // console.log("Start Play ");
+    this.levelGroup = [level.level1, level.level2, level.level3, level.level4];
     this.levelData = this.levelGroup[+currentLevel];
-    console.log(this.levelData);
-    // console.log(typeof(++this.levelData.rotationSpeed));
-    // console.log('Rotation Speed', +this.levelData.rotationSpeed);
-    console.log('Current Level', currentLevel);
-    
-    
+    // console.log(this.levelData);
 
     this.target = this.add.sprite(this.world.width / 2, 300, "target");
     this.target.anchor.setTo(0.5, 0.5);
@@ -89,15 +78,15 @@ export default class Play extends Phaser.State {
       style
     );
     this.coinsText.anchor.setTo(0.5);
-    // sssssssssssssssssss
-    this.coinsText = this.add.text(
+
+
+    this.health = this.add.text(
       this.world.centerX + 250,
-      45,
-      `Health:${}`,
+      70,
+      `Health:${this.enemy.health}`,
       style
     );
-    this.coinsText.anchor.setTo(0.5);
-
+    this.health.anchor.setTo(0.5);
 
     this.pauseBtn = this.add.text(
       this.world.centerX - 250,
@@ -163,7 +152,7 @@ export default class Play extends Phaser.State {
     var sign = Phaser.Math.angleBetween(0, 1) == 0 ? -1 : 1;
     // random number angleBetween - +this.levelData.rotationVariation and +this.levelData.rotationVariation
     var variation = Phaser.RandomDataGenerator.between(
-      - +this.levelData.rotationVariation,
+      -+this.levelData.rotationVariation,
       +this.levelData.rotationVariation
     );
     // new rotation speed
@@ -172,8 +161,8 @@ export default class Play extends Phaser.State {
     // setting new rotation speed limits
     this.newRotationSpeed = Phaser.Math.clamp(
       this.newRotationSpeed,
-      - +this.levelData.maxRotationSpeed,
-       +this.levelData.maxRotationSpeed
+      -+this.levelData.maxRotationSpeed,
+      +this.levelData.maxRotationSpeed
     );
   }
   // Create the coin(apple now) on the target
@@ -235,92 +224,73 @@ export default class Play extends Phaser.State {
             break;
           }
         }
-        // is this a legal hit
-        if (legalHit) {
-          targets.wooden.hit();
-          // is the knife close enough to the coin? And the appls is still to be hit?
-          if (
-            Math.abs(
-              Phaser.Math.getShortestAngle(
-                this.target.angle,
-                180 - this.coin.startAngle
-              )
-            ) < +this.levelData.minAngle &&
-            !this.coin.hit
-          ) {
-            // coin has been hit
-            this.coin.hit = true;
-            this.coin.destroy();
-            // // change coin frame to show one slice
-            // this.coin.setFrame(1);
-
-            // // add the other coin slice in the same coin posiiton
-            // var slice = this.add.sprite(this.coin.x, this.coin.y, "coin", 1);
-
-            // // same angle too.
-            // slice.angle = this.coin.angle;
-
-            // // and same origin
-            // slice.anchor.setTo(0.5, 1);
-
-            // // tween to make coin slices fall down
-            // let sliceCoin = this.game.add.tween(this.coin, slice);
-            // sliceCoin.to(
-            //   {
-            //     y: this.game.height + this.coin.height,
-            //     // x destination
-            //     x: {
-            //       // running a function to get different x ends for each slice according to frame number
-            //       getEnd: function(target, key, value) {
-            //         return (
-            //           Phaser.Math.Between(0, this.world.width / 2) +
-            //           (this.world.width / 2) * (target.frame - 1)
-            //         );
-            //       }
-            //     }
-            //   },
-            //   +this.levelData.throwSpeed * 6,
-            //   Phaser.Easing.Linear.None,
-            //   false,
-            //   2000
-            // );
-            // sliceCoin.onComplete.add(function coinTweenCallback(tween) {
-            //   this.state.start("Play");
-            // }, this);
-            // sliceCoin.start();
-          }
-
+        this.enemy.hit();
+          console.log("After hit the target",this.enemy.health);
           // player can now throw again
           this.canThrow = true;
           this.score++;
           //   playerScore.score.push(this.score);
           this.scoreText.setText(`Score: ${this.score}`);
-          // adding the rotating knife in the same place of the knife just landed on target
-          var knife = this.add.sprite(
-            this.world.width / 2,
-            (this.world.height / 5) * 4,
-            "weapon"
-          );
+          this.health.setText(`Score: ${this.enemy.health}`);
 
-          // impactAngle property saves the target angle when the knife hits the target
-          knife.impactAngle = this.target.angle;
+        // is this a legal hit
+        if (legalHit && this.enemy.health > 0.9) {
+          console.log('Go next', 'legalhit ---', legalHit);
+          console.log('health---', this.enemy.health);
+          console.log("COMPARE", legalHit && this.enemy.health > 0);
+          
+          
+          
+          // this.enemy.hit();
+          // console.log(this.enemy.health);
+          // // player can now throw again
+          // this.canThrow = true;
+          // this.score++;
+          // //   playerScore.score.push(this.score);
+          // this.scoreText.setText(`Score: ${this.score}`);
+            // is the knife close enough to the coin? And the appls is still to be hit?
+            if (
+              Math.abs(
+                Phaser.Math.getShortestAngle(
+                  this.target.angle,
+                  180 - this.coin.startAngle
+                )
+              ) < +this.levelData.minAngle &&
+              !this.coin.hit
+            ) {
+              // coin has been hit
+              this.coin.hit = true;
+              this.coin.destroy();
+            }
 
-          // adding the rotating knife to knifeGroup group
-          this.knifeGroup.add(knife);
+            // adding the rotating knife in the same place of the knife just landed on target
+            var knife = this.add.sprite(
+              this.world.width / 2,
+              (this.world.height / 5) * 4,
+              "weapon"
+            );
 
-          // bringing back the knife to its starting position
-          this.knife.y = (this.world.height / 5) * 4;
+            // impactAngle property saves the target angle when the knife hits the target
+            knife.impactAngle = this.target.angle;
+
+            // adding the rotating knife to knifeGroup group
+            this.knifeGroup.add(knife);
+
+            // bringing back the knife to its starting position
+            this.knife.y = (this.world.height / 5) * 4;
+          
         }
         // in case this is not a legal hit
         else {
-          if(currentLevel<3){
-            currentLevel++
-          } 
-          else{
+          if (currentLevel < 3) {
+            currentLevel++;
+            enemyCounter++
+          } else {
             currentLevel = 0;
+            enemyCounter = 0
           }
           console.log(`Start ${this.currentLevel}  Level`);
-          
+
           let knifeTweenElse = this.game.add.tween(this.knife);
           knifeTweenElse.to(
             {
@@ -333,12 +303,12 @@ export default class Play extends Phaser.State {
           knifeTweenElse.onComplete.add(function(tween) {
             FBInstant.player
               .setDataAsync({
-                currentLevel:currentLevel,
+                enemy:enemyCounter,
+                currentLevel: currentLevel,
                 current: this.score,
                 best: Math.max(playerScore.bestScore, this.score)
               })
-              .then(function() {
-              });
+              .then(function() {});
             // restart the game
             this.state.start("Play");
           }, this);
@@ -410,20 +380,62 @@ export default class Play extends Phaser.State {
     user.getActualScore();
     this.state.start("Menu", true, true);
   }
-  async getUserData(){
-    let response = await FBInstant.player.getDataAsync(["best","currentLevel"])
-      console.log('Response', response);
-      if ( response.best !== undefined) {
-        playerScore.bestScore = response.best;
-      }
-      if(response.currentLevel !== undefined && currentLevel <=3 ){
-        currentLevel = response.currentLevel 
-        console.log('All Good', currentLevel);
-      }
-      else{
-        currentLevel = 0;
-        console.log('All Bad',currentLevel);
-        
-      }
+  async getUserData() {
+    let response = await FBInstant.player.getDataAsync([
+      "best",
+      "currentLevel",
+      "enemy"
+    ]);
+    console.log("Response", response);
+    if (response.best !== undefined) {
+      playerScore.bestScore = response.best;
+    }
+    if (response.currentLevel !== undefined && currentLevel <= 3) {
+      currentLevel = response.currentLevel;
+      console.log("All Good", currentLevel);
+    } else {
+      currentLevel = 0;
+      console.log("All Bad", currentLevel);
+    }
+    if(response.enemy <= 3 && response.enemy !== undefined){
+      enemyCounter = response.enemy
+      console.log("Enemy: ", response.enemy);
+      
+    }
+    else{
+      console.log('Enemy undefenid');
+      enemyCounter = 0
+    }
   }
+}
+
+
+async function  getUserData() {
+  let response = await FBInstant.player.getDataAsync([
+    "best",
+    "currentLevel",
+    "enemy"
+  ]);
+  console.log("Response", response);
+  if (response.best !== undefined) {
+    playerScore.bestScore = response.best;
+  }
+  if (response.currentLevel !== undefined && currentLevel <= 3) {
+    currentLevel = response.currentLevel;
+    console.log("All Good", currentLevel);
+  } else {
+    currentLevel = 0;
+    console.log("All Bad", currentLevel);
+  }
+  if(response.enemy <= 3 && response.enemy !== undefined){
+    enemyCounter = response.enemy
+    console.log("Enemy: ", response.enemy);
+    
+  }
+  else{
+    console.log('Enemy undefenid');
+    enemyCounter = 0
+  }
+  console.log(response);
+  
 }
