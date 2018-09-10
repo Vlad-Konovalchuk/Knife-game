@@ -16,7 +16,7 @@ class Game extends Phaser.Game {
     const config = {
       height,
       width,
-      backgroundColor: "#000",
+      backgroundColor: "#922d20",
       type: Phaser.CANVAS
     };
     super(config);

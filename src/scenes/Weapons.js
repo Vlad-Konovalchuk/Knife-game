@@ -11,7 +11,7 @@ import item4 from "../../assets/targ.png";
 // ---
 import arrow from "../../assets/arrow2.png";
 
-import {UserWeapon} from "./UserWeapon";
+import { UserWeapon } from "./UserWeapon";
 
 class Knife {
   constructor(path) {
@@ -35,7 +35,13 @@ export default class Weapons extends Phaser.State {
     this.load.image("target", item2);
     this.load.image("target", item3);
     this.load.image("target", item4);
-
+    // -----------------------------
+    this.load.image("weapon", knife1);
+    this.load.image("weapon", knife2);
+    this.load.image("weapon", knife3);
+    this.load.image("weapon", knife4);
+    this.load.image("weapon", knife5);
+    // -----------------------------
     this.load.image("knife1", knife1);
     this.load.image("knife2", knife2);
     this.load.image("knife3", knife3);
@@ -61,7 +67,8 @@ export default class Weapons extends Phaser.State {
     this.title.events.onInputDown.add(() => {
       this.state.start("Menu");
     }, this);
-
+    this.knifeText = false;
+    this.knifePrice = false;
     this.knifeStore = [
       {
         key: "knife1",
@@ -181,7 +188,10 @@ export default class Weapons extends Phaser.State {
     this.currentKnife = newKnife;
   }
   showText(knife) {
+    console.log("Show text");
     if (!this.knifeText && !this.knifePrice) {
+      console.log("Show text - true");
+
       this.knifeText = this.game.add.text(
         this.game.width / 2,
         this.game.height * 0.7,

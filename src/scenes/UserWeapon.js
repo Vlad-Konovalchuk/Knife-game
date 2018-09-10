@@ -34,15 +34,15 @@ class Target {
     this.viewPath = viewPath;
   }
   hit() {
-    this.health -= (this.health / 2);
+    this.health -= 5;
   }
 }
 
 // creating Targets
 let wooden = new Target(10, "assets/targ1.png");
-let bear = new Target(23, "assets/targ1.png");
-let celts = new Target(34, "assets/targ3.jpg");
-let north = new Target(42, "assets/targ.png");
+let bear = new Target(20, "assets/targ1.png");
+let celts = new Target(30, "assets/targ3.jpg");
+let north = new Target(40, "assets/targ.png");
 const targets = {
     wooden:wooden,
     bear:bear,

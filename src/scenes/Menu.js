@@ -38,7 +38,9 @@ export default class Menu extends Phaser.State {
     this.userLogo.anchor.set(0.5);
     this.userLogo.width = 100;
     this.userLogo.height = 100;
-
+    // this.userLogo.body.setCircle(50)
+    this.circle = new Phaser.Circle( this.world.centerX,
+      this.world.centerY - 190,50)
     // current score
     this.currentScore = this.add
       .text(
