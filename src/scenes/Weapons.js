@@ -3,15 +3,13 @@ import knife2 from "../../assets/knife2.png";
 import knife3 from "../../assets/knife3.png";
 import knife4 from "../../assets/knife4.png";
 import knife5 from "../../assets/knife5.png";
-// ---
-import item1 from "../../assets/targ1.png";
+// ---targets
+import item1 from "../../assets/targ.png";
 import item2 from "../../assets/targ1.png";
-import item3 from "../../assets/targ3.jpg";
-import item4 from "../../assets/targ.png";
+import item3 from "../../assets/targ2.png";
+import item4 from "../../assets/target3.jpg";
 // ---
 import arrow from "../../assets/arrow2.png";
-
-import { UserWeapon } from "./UserWeapon";
 
 class Knife {
   constructor(path) {
@@ -48,6 +46,8 @@ export default class Weapons extends Phaser.State {
     this.load.image("knife4", knife4);
     this.load.image("knife5", knife5);
     this.load.image("arrow", arrow);
+
+    // Scale Manager for responsive
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
@@ -218,17 +218,15 @@ export default class Weapons extends Phaser.State {
     this.knifePrice.visible = true;
   }
   setKnife() {
-    // UserWeapon.knife = this.currentKnife.customParams.class
-
     FBInstant.player
       .setDataAsync({
         currentKnife: this.currentKnife.customParams.class
       })
       .then(() => {
-        console.log("Data is Set");
+        console.log("Yepp! Weapon is set");
       })
       .catch(err => {
-        console.log("Something go wrong");
+        console.log("Ops! Weapon does not set:(");
         console.log(err);
       });
   }

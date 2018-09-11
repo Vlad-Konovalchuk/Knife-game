@@ -41,10 +41,14 @@ class User {
     this.best = response[3].best;
   }
   async getActualScore() {
-    const response = await FBInstant.player.getDataAsync(["current", "best"]);
-    console.log("Actual Store", response);
-    this.current = response.current;
-    this.best = response.best;
+    try {
+      const response = await FBInstant.player.getDataAsync(["current", "best"]);
+      console.log("Actual Store", response);
+      this.current = response.current;
+      this.best = response.best;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

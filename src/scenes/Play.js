@@ -1,15 +1,8 @@
 import { UserWeapon } from "./UserWeapon";
-import back from "../../assets/china.png";
-// import knife1 from "../../assets/knife.png";
-// import knife2 from "../../assets/knife2.png";
-// import knife3 from "../../assets/knife3.png";
-// import knife4 from "../../assets/knife4.png";
-// import knife5 from "../../assets/knife5.png";
-import arrow2 from "../../assets/arrow2.png";
+import level from "../../assets/level.json";
 import coin from "../../assets/apple.png";
 import { user } from "../Game";
 import { targets } from "./UserWeapon";
-import level from "../../assets/level.json";
 
 let playerScore = {
   bestScore: 0
@@ -19,13 +12,11 @@ let style = {
   fill: "#fff"
 };
 let currentLevel;
-
-let enemyCounter;
+// let enemyCounter;
 
 getUserData();
 
 export default class Play extends Phaser.State {
-  // method to be executed when the scene preloads
   preload() {
     // Array of targets
     this.enemyGroup = [
@@ -34,18 +25,15 @@ export default class Play extends Phaser.State {
       targets.celts,
       targets.north
     ];
+    this.enemy = null;
+    this.levelGroup;
+    this.levelData;
+    // Set Level Settings
+    this.levelGroup = [level.level1, level.level2, level.level3, level.level4];
+    this.levelData = this.levelGroup[+currentLevel];
     // Get the current enemy
-    this.enemy = this.enemyGroup[enemyCounter < 4 ? enemyCounter : 0];
-    // this.health = this.enemy.health
-    console.log(
-      "------------------------------------------------------------------"
-    );
-    console.log("curent", enemyCounter);
-    console.log(this.enemyGroup);
-    console.log(this.enemy);
-    console.log(
-      "------------------------------------------------------------------"
-    );
+    this.enemy = Object.assign(this.enemyGroup[currentLevel]);
+
     // loading assets
     this.load.image("target", this.enemy.viewPath);
     this.load.image(
@@ -54,11 +42,9 @@ export default class Play extends Phaser.State {
         ? UserWeapon.knife
         : "../../assets/knife3.png"
     );
-    this.load.image("arrow", arrow2);
     this.load.spritesheet("coin", coin, 70, 96);
   }
   create() {
-
     // Set Scale MAnager for responsive
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
@@ -66,11 +52,7 @@ export default class Play extends Phaser.State {
 
     // Set initial score
     this.score = 0;
-    this.coins= 0;
-
-    // Set Level Settings
-    this.levelGroup = [level.level1, level.level2, level.level3, level.level4];
-    this.levelData = this.levelGroup[+currentLevel];
+    this.coins = 0;
 
     // Set score text
     this.scoreText = this.add.text(
@@ -80,28 +62,16 @@ export default class Play extends Phaser.State {
       style
     );
     this.scoreText.anchor.setTo(0.5);
-    
-    // Set coins text
-    this.coinsText = this.add.text(
-      this.world.centerX + 250,
-      45,
-      `Coins: 0`,
-      style
-    );
-    this.coinsText.anchor.setTo(0.5);
 
-    this.restartBtn = this.add.text(
-      this.world.centerX,
-      45,
-      `Restart`,
-      style
-    );
+    this.restartBtn = this.add.text(this.world.centerX, 45, `Restart`, style);
+
     this.restartBtn.anchor.setTo(0.5);
     this.restartBtn.inputEnabled = true;
     this.restartBtn.events.onInputDown.add(() => {
-      this.state.restart()
+      document.location.reload(true);
     }, this);
-        // Set coins text
+
+    // Set coins text
     this.coinsText = this.add.text(
       this.world.centerX + 250,
       45,
@@ -109,14 +79,7 @@ export default class Play extends Phaser.State {
       style
     );
     this.coinsText.anchor.setTo(0.5);
-    // Set health score
-    this.health = this.add.text(
-      this.world.centerX + 250,
-      70,
-      `Health:${this.enemy.health}`,
-      style
-    );
-    this.health.anchor.setTo(0.5);
+
     // Set the pause button
     this.pauseBtn = this.add.text(
       this.world.centerX - 250,
@@ -129,6 +92,7 @@ export default class Play extends Phaser.State {
     this.pauseBtn.events.onInputDown.add(() => {
       this.game.paused = !this.game.paused;
     }, this);
+
     // Set the exit button
     this.exitBtn = this.add.text(
       this.world.centerX + 250,
@@ -151,10 +115,23 @@ export default class Play extends Phaser.State {
     );
     this.knife.anchor.setTo(0.5, 0.5);
     this.knife.scale.setTo(0.5);
+
     //Set target settings
     this.target = this.add.sprite(this.world.width / 2, 300, "target");
     this.target.anchor.setTo(0.5, 0.5);
     this.target.scale.setTo(0.7);
+    // Set health of target
+    this.target.health = this.enemy.health;
+    console.log(this.target.health);
+    // Set health score text
+    this.health = this.add.text(
+      this.world.centerX + 250,
+      70,
+      `Health:${this.target.health}`,
+      style
+    );
+    this.health.anchor.setTo(0.5);
+
     // moving the target on front
     this.target.depth = 1;
     this.target.bringToTop();
@@ -166,13 +143,6 @@ export default class Play extends Phaser.State {
     // can the player throw a knife? Yes, at the beginning of the game
     this.canThrow = true;
 
-    // this is how we create a looped timer event
-    // var timedEvent = this.time.events.add({
-    //     delay: +this.levelData.changeTime,
-    //     callback: this.changeSpeed,
-    //     callbackScope: this,
-    //     loop: true
-    // });
     this.createCoin();
   }
   // method to be executed at each frame. Please notice the arguments.
@@ -217,10 +187,11 @@ export default class Play extends Phaser.State {
       this.coin.y = this.target.y + (this.target.width / 2) * Math.sin(radians);
     }
   }
+
   fbSaveData() {
     FBInstant.player
       .setDataAsync({
-        enemy: enemyCounter,
+        // enemy: enemyCounter,
         currentLevel: currentLevel,
         current: this.score,
         best: Math.max(playerScore.bestScore, this.score)
@@ -232,46 +203,15 @@ export default class Play extends Phaser.State {
   // Function for exit to main menu
   exit() {
     this.fbSaveData();
-    // FBInstant.player
-    //   .setDataAsync({
-    //     current: this.score,
-    //     best: Math.max(playerScore.bestScore, this.score)
-    //   })
-    //   .then(function() {
-    //     console.log("data is set");
-    //   });
     user.getActualScore();
+    let ass = 13;
     this.state.start("Menu", true, true);
-  }
-  async getUserData() {
-    let response = await FBInstant.player.getDataAsync([
-      "best",
-      "currentLevel",
-      "enemy"
-    ]);
-    console.log("Response", response);
-    if (response.best !== undefined) {
-      playerScore.bestScore = response.best;
-    }
-    if (response.currentLevel !== undefined && currentLevel <= 3) {
-      currentLevel = response.currentLevel;
-      console.log("All Good", currentLevel);
-    } else {
-      currentLevel = 0;
-      console.log("All Bad", currentLevel);
-    }
-    if (response.enemy <= 3 && response.enemy !== undefined) {
-      enemyCounter = response.enemy;
-      console.log("Enemy: ", response.enemy);
-    } else {
-      console.log("Enemy undefenid");
-      enemyCounter = 0;
-    }
   }
   // method to change the rotation speed of the target
   changeSpeed() {
     // ternary operator to choose from +1 and -1
     var sign = Phaser.Math.angleBetween(0, 1) == 0 ? -1 : 1;
+
     // random number angleBetween - +this.levelData.rotationVariation and +this.levelData.rotationVariation
     var variation = Phaser.RandomDataGenerator.between(
       -+this.levelData.rotationVariation,
@@ -309,7 +249,6 @@ export default class Play extends Phaser.State {
     // coin depth is the same as target depth
     this.coin.depth = 1;
   }
-
   // method to throw a knife
   throwKnife() {
     // can the player throw?
@@ -341,41 +280,17 @@ export default class Play extends Phaser.State {
               )
             ) < +this.levelData.minAngle
           ) {
+            this.enemy.resetHealth();
             // this is not a legal hit
             legalHit = false;
             // no need to continue with the loop
             break;
           }
         }
-        this.enemy.hit();
-        console.log("After hit the target", this.enemy.health);
-        // player can now throw again
-        this.canThrow = true;
-        this.score++;
-        //   playerScore.score.push(this.score);
-        this.scoreText.setText(`Score: ${this.score}`);
-        this.health.setText(`Score: ${this.enemy.health}`);
 
         // is this a legal hit
-        if (legalHit && this.enemy.health > 0.9) {
-          console.log("Go next", "legalhit ---", legalHit);
-          console.log("health---", this.enemy.health);
-          console.log("COMPARE", legalHit && this.enemy.health > 0);
-
-          if (
-            Math.abs(
-              Phaser.Math.getShortestAngle(
-                this.target.angle,
-                180 - this.coin.startAngle
-              )
-            ) < +this.levelData.minAngle &&
-            !this.coin.hit
-          ) {
-            // coin has been hit
-            this.coin.hit = true;
-            this.coinsText.setText(`Coins: ${this.coins}`)
-            this.coin.destroy();
-          }
+        if (legalHit && this.enemy.health > 0) {
+          this.checkHitCoin();
 
           // adding the rotating knife in the same place of the knife just landed on target
           var knife = this.add.sprite(
@@ -392,17 +307,37 @@ export default class Play extends Phaser.State {
 
           // bringing back the knife to its starting position
           this.knife.y = (this.world.height / 5) * 4;
-        }
-        else if(!legalHit){
+
+          this.enemy.hit();
+          console.log(this.target.health);
+          this.target.setHealth(this.target.health - 5);
+          // player can now throw again
+          this.canThrow = true;
+          this.score++;
+          console.log("GROUP", this.enemyGroup);
+          //   Update text of score and health of target
+          this.scoreText.setText(`Score: ${this.score}`);
+          this.health.setText(`Health:${this.target.health}`);
+        } 
+        
+        
+        
+        else if (!legalHit) {
+          this.enemy.resetHealth();
+
           this.game.paused = true;
-               // Then add the menu
-          menu = game.add.sprite(w/2, h/2, 'menu');
-          menu.anchor.setTo(0.5, 0.5);
-
-          // And a label to illustrate which menu item was chosen. (This is not necessary)
-          choiseLabel = game.add.text(w/2, h-150, 'Click outside menu to continue', { font: '30px Arial', fill: '#fff' });
-          choiseLabel.anchor.setTo(0.5, 0.5);
-
+          // Then add the menu
+          this.pauseText = this.add.text(
+            this.game.world.centerX,
+            this.game.world.centerY,
+            "End of the game\n Invite friends\n and continue to hit the target",
+            style
+          );
+          this.pauseText.anchor.setTo(0.5, 0.5);
+          this.pauseText.inputEnabled = true;
+          this.pauseText.events.onInputDown.add(() => {
+            this.game.paused = !this.game.paused;
+          }, this);
 
           let knifeTweenElse = this.game.add.tween(this.knife);
           knifeTweenElse.to(
@@ -415,22 +350,61 @@ export default class Play extends Phaser.State {
           );
           knifeTweenElse.onComplete.add(function(tween) {
             this.fbSaveData();
-            this.state.start("Menu");
+            this.state.start("Menu", true, false);
+          }, this);
+          knifeTweenElse.start();
+        }
+
+
+
+        else if(!this.target.health > 0){
+          this.enemy.resetHealth();
+          if (currentLevel < 3) {
+            currentLevel++;
+          } else {
+            currentLevel = 0;
+          }
+
+          let knifeTweenElse = this.game.add.tween(this.knife);
+          knifeTweenElse.to(
+            {
+              y: this.world.centerY + this.knife.height
+            },
+            +this.levelData.throwSpeed * 2,
+            null,
+            false
+          );
+          knifeTweenElse.onComplete.add(function(tween) {
+            this.fbSaveData();
+            this.state.start("Play", true, false);
           }, this);
           knifeTweenElse.start();
         }
         // in case this is not a legal hit
-        else {
+        // else {
+        //   this.enemy.resetHealth();
+        //   if (currentLevel < 3) {
+        //     currentLevel++;
+        //   } else {
+        //     currentLevel = 0;
+        //   }
 
-          if (currentLevel < 3) {
-            currentLevel++;
-            enemyCounter++;
-          } else {
-            currentLevel = 0;
-            enemyCounter = 0;
-          }
-          this.shareFriends();
-        }
+        //   let knifeTweenElse = this.game.add.tween(this.knife);
+        //   knifeTweenElse.to(
+        //     {
+        //       y: this.world.centerY + this.knife.height
+        //     },
+        //     +this.levelData.throwSpeed * 2,
+        //     null,
+        //     false
+        //   );
+        //   knifeTweenElse.onComplete.add(function(tween) {
+        //     this.fbSaveData();
+        //     // this.state.destroy()
+        //     this.state.start("Menu", true, false);
+        //   }, this);
+        //   knifeTweenElse.start();
+        // }
       }, this);
       knifeThrow.start();
     }
@@ -443,31 +417,42 @@ export default class Play extends Phaser.State {
       data: { myReplayData: "..." }
     });
   }
+  checkHitCoin() {
+    if (
+      Math.abs(
+        Phaser.Math.getShortestAngle(
+          this.target.angle,
+          180 - this.coin.startAngle
+        )
+      ) < +this.levelData.minAngle &&
+      !this.coin.hit
+    ) {
+      // coin has been hit
+      this.coin.hit = true;
+      this.coinsText.setText(`Coins: ${this.coins}`);
+      this.coin.destroy();
+    }
+  }
 }
 
 async function getUserData() {
-  let response = await FBInstant.player.getDataAsync([
-    "best",
-    "currentLevel",
-    "enemy"
-  ]);
-  console.log("Response", response);
-  if (response.best !== undefined) {
-    playerScore.bestScore = response.best;
+  try {
+    let response = await FBInstant.player.getDataAsync([
+      "best",
+      "currentLevel",
+      "current"
+    ]);
+    console.log("Response", response);
+    if (response.best !== undefined && response.currentLevel !== undefined) {
+      if (response.currentLevel > 3) {
+        return (currentLevel = 0);
+      }
+      playerScore.bestScore = response.best;
+      currentLevel = response.currentLevel;
+    } else {
+      console.log("Problems");
+    }
+  } catch (error) {
+    console.log(error);
   }
-  if (response.currentLevel !== undefined && currentLevel <= 3) {
-    currentLevel = response.currentLevel;
-    console.log("All Good", currentLevel);
-  } else {
-    currentLevel = 0;
-    console.log("All Bad", currentLevel);
-  }
-  if (response.enemy <= 3 && response.enemy !== undefined) {
-    enemyCounter = response.enemy;
-    console.log("Enemy: ", response.enemy);
-  } else {
-    console.log("Enemy undefenid");
-    enemyCounter = 0;
-  }
-  console.log(response);
 }

@@ -4,14 +4,26 @@ let style = {
   fontWeight: "bold",
   fill: "#fff"
 };
-
+ function restart(){
+   user.getActualScore()
+}
 export default class Menu extends Phaser.State {
   // method to be executed when the scene preloads
   preload() {
+    
+    // this.signal = new Phaser.Signal();
+    // this.signal.addOnce(this.reset, this);
+    // this.signal.dispatch();  
+    this.load.onLoadComplete.addOnce(this.reset,this) 
     this.load.crossOrigin = "anonymous";
     this.load.image("profile", user.playerPic);
   }
   create() {
+    restart()
+    this.sig = this.add.signal
+    user.getActualScore()
+   console.log(this.cache); 
+    console.log('Creat MMenu state');
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
@@ -50,7 +62,6 @@ export default class Menu extends Phaser.State {
         style
       )
       .anchor.setTo(0.5, 0.5);
-
     // best score
     this.bestScore = this.add
       .text(
@@ -109,19 +120,20 @@ export default class Menu extends Phaser.State {
     this.btn.inputEnabled = true;
     this.btn.events.onInputDown.add(this.startGame, this);
   }
-
-  startGame() {
-    // console.log(item);
-    this.state.start("Play");
+  reset(){
+    console.log('Reset------------------------------------------------');
+    this.state.restart()
   }
-  toSettings(item) {
-    // console.log(item);
-    this.state.start("Settings");
+  startGame() {
+    this.state.start("Play",true,false);
+  }
+  toSettings() {
+    this.state.start("Settings",true,false);
   }
   toShop() {
-    this.state.start("Weapons");
+    this.state.start("Weapons",true,false);
   }
   toLeaderBoard() {
-    this.state.start("Leaders");
+    this.state.start("Leaders",true,false);
   }
 }
