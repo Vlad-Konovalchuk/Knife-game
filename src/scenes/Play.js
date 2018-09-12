@@ -150,6 +150,17 @@ export default class Play extends Phaser.State {
 
     this.createCoin();
   }
+  checkHealth() {
+    console.log("CurrentLevel", currentLevel);
+    // this is not a legal hit
+    this.enemy.resetHealth();
+    // Check size of level
+    currentLevel < 3 ? currentLevel++ : (currentLevel = 0);
+    console.log("You win this level");
+    console.log("CurrentLevel", currentLevel);
+    // Restart Game
+    this.switchNextLevel();
+  }
   // method to be executed at each frame. Please notice the arguments.
   update(time) {
     if (this.game.input.activePointer.isDown) {
@@ -190,6 +201,9 @@ export default class Play extends Phaser.State {
       // adjusting coin position
       this.coin.x = this.target.x + (this.target.width / 2) * Math.cos(radians);
       this.coin.y = this.target.y + (this.target.width / 2) * Math.sin(radians);
+    }
+    if (this.target.health <= 0) {
+      this.checkHealth();
     }
   }
 
@@ -309,7 +323,7 @@ export default class Play extends Phaser.State {
     this.game.paused = true;
     this.resumeGame = null;
     const textStyle = {
-      font: "normal 24px Arial",
+      font: "bold 30px Arial",
       fill: "#ffffff",
       align: "center",
       boundsAlignH: "center", // bounds center align horizontally
@@ -322,8 +336,8 @@ export default class Play extends Phaser.State {
     this.graphics = this.add.graphics(0, 0);
     // this.graphics.pivot.set(0.5,0.5)
     this.menuText = this.add.text(0, 0, text, textStyle);
-
-    this.shareText = this.add.text(0, 0, "Share with friends", textStyle);
+    this.menuText.anchor.setTo(0.5);
+    this.shareText = this.add.text(0, 0, "Share", textStyle);
     this.shareText.inputEnabled = true;
     this.shareText.events.onInputDown.add(() => {
       FBInstant.shareAsync({
@@ -337,54 +351,44 @@ export default class Play extends Phaser.State {
         this.checkStatusContinue();
       });
     }, this);
+    this.shareText.anchor.setTo(0.5);
+
     this.restartGame = this.add.text(0, 0, "Restart", textStyle);
     this.restartGame.inputEnabled = true;
     this.restartGame.events.onInputDown.add(() => {
-      this.fbSaveData();
+      // this.fbSaveData();
       this.resumeGame = false;
       this.checkStatusContinue();
     }, this);
+    this.restartGame.anchor.setTo(0.5);
 
     this.drawMenu();
   }
   drawMenu() {
     // graphics and textElement bounds/sizes must be the same
     // so your text area covers the whole rectangle
-    this.graphics.beginFill(0x000000, 0.2);
-    this.graphics.drawRect(
-      0,
-      400,
-      550,
-      750
-    );
-    this.menuText.setTextBounds(
-      0,
-      400,
-      550,
-      750
-    );
-    this.shareText.setTextBounds(
-      0,
-      400,
-      550,
-      750
-    );
-    this.restartGame.setTextBounds(
-      0,
-     400,
-      550,
-      750
-    );
+    this.graphics.lineStyle(2, 0xffffff, 1);
+    this.graphics.beginFill(0xff700b, 0.5);
+    this.graphics.drawRect(0, 200, 750, 750);
+    this.menuText.setTextBounds(this.game.world.width / 3 + 14, 200, 750, 750);
+    this.shareText.setTextBounds(this.graphics.centerX / 3 - 8, 250, 550, 750);
+    this.restartGame.setTextBounds(this.graphics.centerX / 3, 330, 550, 750);
     this.graphics.addChild(this.shareText);
     this.graphics.addChild(this.restartGame);
     this.graphics.addChild(this.menuText);
   }
   checkStatusContinue() {
     if (this.resumeGame == true) {
-      console.log("---Success checkStatus");
-      this.game.paused = false;
-      this.graphics.destroy(true);
-      this.setNewKnife();
+      if (this.target.health > 0) {
+        console.log("---Success checkStatus");
+        this.game.paused = false;
+        this.graphics.destroy(true);
+        this.setNewKnife();
+      } else {
+        this.enemy.resetHealth();
+        currentLevel = 0;
+        this.state.start("Play", true, false);
+      }
     } else {
       this.game.paused = false;
       this.enemy.resetHealth();
