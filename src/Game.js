@@ -30,44 +30,10 @@ class Game extends Phaser.Game {
   }
 }
 
-class User {
-  constructor(response) {
-    this.playerName = response[0];
-    this.playerPic = response[1];
-    this.friends = response[2].map(item => {
-      return item.$1.name;
-    });
-    this.current = response[3].current;
-    this.best = response[3].best;
-    this.coins = response.coins;
-    this.currentLevel = response.currentLevel;
 
-  }
-  async getActualScore() {
-    try {
-      const response = await FBInstant.player.getDataAsync(["current", "best"]);
-      console.log("Actual Store", response);
-      this.current = response.current;
-      this.best = response.best;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-}
 
 async function getFB() {
   try {
-    await FBInstant.initializeAsync();
-    await FBInstant.startGameAsync();
-    const response = await Promise.all([
-      FBInstant.player.getName(),
-      FBInstant.player.getPhoto(),
-      FBInstant.player.getConnectedPlayersAsync(),
-      FBInstant.player.getDataAsync(["current", "best","currentLevel","coins"])
-    ]);
-
-    console.log(response);
-    user = new User(response);
     new Game();
   } catch (error) {
     console.log(error);

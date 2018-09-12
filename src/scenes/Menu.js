@@ -9,15 +9,14 @@ export default class Menu extends Phaser.State {
   // method to be executed when the scene preloads
   preload() {
     this.load.crossOrigin = "anonymous";
-    this.load.image("profile", user.playerPic);
+    // this.load.image("profile", user.playerPic);
   }
   create() {
-    user.getActualScore()
+    // user.getActualScore()
     console.log(this.cache); 
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
-    console.log("user", user);
     let title = this.add.text(
       this.world.centerX,
       this.world.centerY - 300,
@@ -28,25 +27,25 @@ export default class Menu extends Phaser.State {
     this.userName = this.add.text(
       this.world.centerX,
       this.world.centerY - 250,
-      `Welcome ${user.playerName}`,
+      `Welcome User`,
       style
     );
     this.userName.anchor.setTo(0.5);
-    this.userLogo = this.add.image(
-      this.world.centerX,
-      this.world.centerY - 190,
-      "profile"
-    );
-    this.userLogo.anchor.set(0.5);
-    this.userLogo.width = 100;
-    this.userLogo.height = 100;
+    // this.userLogo = this.add.image(
+    //   this.world.centerX,
+    //   this.world.centerY - 190,
+    //   "profile"
+    // );
+    // this.userLogo.anchor.set(0.5);
+    // this.userLogo.width = 100;
+    // this.userLogo.height = 100;
 
     // current score
     this.currentScore = this.add
       .text(
         this.world.centerX,
         this.world.centerY - 80,
-        `Score:${user.current}`,
+        `Score:2`,
         style
       )
       .anchor.setTo(0.5, 0.5);
@@ -55,7 +54,7 @@ export default class Menu extends Phaser.State {
       .text(
         this.world.centerX,
         this.world.centerY - 40,
-        `BEST SCORE:${user.best}`,
+        `BEST SCORE:10`,
         style
       )
       .anchor.setTo(0.5, 0.5);

@@ -1,5 +1,6 @@
 import { UserWeapon } from "./UserWeapon";
 import level from "../../assets/level.json";
+import knife from "../../assets/level.json";
 import coin from "../../assets/apple.png";
 import { user } from "../Game";
 import { targets } from "./UserWeapon";
@@ -11,10 +12,9 @@ let style = {
   fontWeight: "bold",
   fill: "#fff"
 };
-let coins;
+let coins = 30;
 let legalHit;
-let currentLevel;
-getUserData();
+let currentLevel = 2;
 
 export default class Play extends Phaser.State {
   preload() {
@@ -37,12 +37,7 @@ export default class Play extends Phaser.State {
 
     // loading assets
     this.load.image("target", this.enemy.viewPath);
-    this.load.image(
-      "weapon",
-      UserWeapon.knife !== undefined
-        ? UserWeapon.knife
-        : "../../assets/knife3.png"
-    );
+    this.load.image("weapon", "../../assets/knife3.png");
     this.load.spritesheet("coin", coin, 70, 96);
     // this.coins = coins;
     this.coins = coins;
@@ -191,25 +186,28 @@ export default class Play extends Phaser.State {
       this.coin.x = this.target.x + (this.target.width / 2) * Math.cos(radians);
       this.coin.y = this.target.y + (this.target.width / 2) * Math.sin(radians);
     }
+    if(this.target.health <= 0 ){
+      this.checkHealth()
+    }
   }
 
-  fbSaveData() {
-    FBInstant.player
-      .setDataAsync({
-        // enemy: enemyCounter,
-        currentLevel: currentLevel,
-        current: this.score,
-        best: Math.max(playerScore.bestScore, this.score),
-        coins: this.coins
-      })
-      .then(function() {
-        console.log("data is set");
-      });
-  }
+  // fbSaveData() {
+  //   FBInstant.player
+  //     .setDataAsync({
+  //       // enemy: enemyCounter,
+  //       currentLevel: currentLevel,
+  //       current: this.score,
+  //       best: Math.max(playerScore.bestScore, this.score),
+  //       coins: this.coins
+  //     })
+  //     .then(function() {
+  //       console.log("data is set");
+  //     });
+  // }
   // Function for exit to main menu
   exit() {
-    this.fbSaveData();
-    user.getActualScore();
+    // this.fbSaveData();
+    // user.getActualScore();
     let ass = 13;
     this.state.start("Menu", true, true);
   }
@@ -268,18 +266,19 @@ export default class Play extends Phaser.State {
       false
     );
     knifeTweenElse.onComplete.add(function(tween) {
-      this.fbSaveData();
+      // this.fbSaveData();
       this.state.start("Play", true, false);
     }, this);
     knifeTweenElse.start();
   }
   shareFriends() {
-    FBInstant.shareAsync({
-      intent: "REQUEST",
-      image: "myBase64Picture",
-      text: "Hey I'm stuck on this target! Can you help me?",
-      data: { myReplayData: "..." }
-    });
+    // FBInstant.shareAsync({
+    //   intent: "REQUEST",
+    //   image: "myBase64Picture",
+    //   text: "Hey I'm stuck on this target! Can you help me?",
+    //   data: { myReplayData: "..." }
+    // });
+    console.log("Sharee to friends !!!!");
   }
   checkHitCoin() {
     if (
@@ -296,20 +295,20 @@ export default class Play extends Phaser.State {
       this.coins += 5;
       this.coinsText.setText(`Coins: ${this.coins}`);
       this.coin.destroy();
-      FBInstant.player
-        .setDataAsync({
-          coins: this.coins
-        })
-        .then(function() {
-          console.log("Coins are save");
-        });
+      // FBInstant.player
+      //   .setDataAsync({
+      //     coins: this.coins
+      //   })
+      //   .then(function() {
+      //     console.log("Coins are save");
+      //   });
     }
   }
   gameOverMenu() {
     this.game.paused = true;
     this.resumeGame = null;
     const textStyle = {
-      font: "normal 24px Arial",
+      font: "bold 30px Arial",
       fill: "#ffffff",
       align: "center",
       boundsAlignH: "center", // bounds center align horizontally
@@ -322,69 +321,62 @@ export default class Play extends Phaser.State {
     this.graphics = this.add.graphics(0, 0);
     // this.graphics.pivot.set(0.5,0.5)
     this.menuText = this.add.text(0, 0, text, textStyle);
-
-    this.shareText = this.add.text(0, 0, "Share with friends", textStyle);
+    this.menuText.anchor.setTo(0.5);
+    this.shareText = this.add.text(0, 0, "Share", textStyle);
     this.shareText.inputEnabled = true;
     this.shareText.events.onInputDown.add(() => {
-      FBInstant.shareAsync({
-        intent: "REQUEST",
-        image: "user",
-        text: "Hey I'm stuck on this target! Can you help me?",
-        data: { myReplayData: "msg" }
-      }).then(() => {
-        console.log("Success share");
-        this.resumeGame = true;
-        this.checkStatusContinue();
-      });
+      // FBInstant.shareAsync({
+      //   intent: "REQUEST",
+      //   image: "user",
+      //   text: "Hey I'm stuck on this target! Can you help me?",
+      //   data: { myReplayData: "msg" }
+      // }).then(() => {
+      //   console.log("Success share");
+      //   this.resumeGame = true;
+      //   this.checkStatusContinue();
+      // });
+      console.log("Shareeeee!");
+      this.resumeGame = true;
+      this.checkStatusContinue();
     }, this);
+    this.shareText.anchor.setTo(0.5);
+
     this.restartGame = this.add.text(0, 0, "Restart", textStyle);
     this.restartGame.inputEnabled = true;
     this.restartGame.events.onInputDown.add(() => {
-      this.fbSaveData();
+      // this.fbSaveData();
       this.resumeGame = false;
       this.checkStatusContinue();
     }, this);
+    this.restartGame.anchor.setTo(0.5);
 
     this.drawMenu();
   }
   drawMenu() {
     // graphics and textElement bounds/sizes must be the same
     // so your text area covers the whole rectangle
-    this.graphics.beginFill(0x000000, 0.2);
-    this.graphics.drawRect(
-      0,
-      400,
-      550,
-      750
-    );
-    this.menuText.setTextBounds(
-      0,
-      400,
-      550,
-      750
-    );
-    this.shareText.setTextBounds(
-      0,
-      400,
-      550,
-      750
-    );
-    this.restartGame.setTextBounds(
-      0,
-     400,
-      550,
-      750
-    );
+    this.graphics.lineStyle(2, 0xffffff, 1);
+    this.graphics.beginFill(0xff700b, 0.5);
+    this.graphics.drawRect(0, 200, 750, 750);
+    this.menuText.setTextBounds(this.game.world.width / 3 + 14, 200, 750, 750);
+    this.shareText.setTextBounds(this.graphics.centerX / 3 - 8, 250, 550, 750);
+    this.restartGame.setTextBounds(this.graphics.centerX / 3, 330, 550, 750);
     this.graphics.addChild(this.shareText);
     this.graphics.addChild(this.restartGame);
     this.graphics.addChild(this.menuText);
   }
   checkStatusContinue() {
     if (this.resumeGame == true) {
-      console.log("---Success checkStatus");
-      this.game.paused = false;
-      this.graphics.destroy(true);
-      this.setNewKnife();
+        if(this.target.health > 0){
+          console.log("---Success checkStatus");
+          this.game.paused = false;
+          this.graphics.destroy(true);
+          this.setNewKnife();
+        }
+        else{
+          this.enemy.resetHealth();
+        currentLevel = 0;
+        this.state.start("Play", true, false);}
     } else {
       this.game.paused = false;
       this.enemy.resetHealth();
@@ -480,6 +472,17 @@ export default class Play extends Phaser.State {
       }, this);
       knifeThrow.start();
     }
+  }
+  checkHealth(){
+    console.log("CurrentLevel", currentLevel);
+          // this is not a legal hit
+          this.enemy.resetHealth();
+          // Check size of level
+          currentLevel < 3 ? currentLevel++ : (currentLevel = 0);
+          console.log("You win this level");
+          console.log("CurrentLevel", currentLevel);
+          // Restart Game
+          this.switchNextLevel();
   }
 }
 
