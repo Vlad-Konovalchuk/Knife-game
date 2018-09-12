@@ -4,26 +4,16 @@ let style = {
   fontWeight: "bold",
   fill: "#fff"
 };
- function restart(){
-   user.getActualScore()
-}
+
 export default class Menu extends Phaser.State {
   // method to be executed when the scene preloads
   preload() {
-    
-    // this.signal = new Phaser.Signal();
-    // this.signal.addOnce(this.reset, this);
-    // this.signal.dispatch();  
-    this.load.onLoadComplete.addOnce(this.reset,this) 
     this.load.crossOrigin = "anonymous";
     this.load.image("profile", user.playerPic);
   }
   create() {
-    restart()
-    this.sig = this.add.signal
     user.getActualScore()
-   console.log(this.cache); 
-    console.log('Creat MMenu state');
+    console.log(this.cache); 
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
@@ -50,9 +40,7 @@ export default class Menu extends Phaser.State {
     this.userLogo.anchor.set(0.5);
     this.userLogo.width = 100;
     this.userLogo.height = 100;
-    // this.userLogo.body.setCircle(50)
-    this.circle = new Phaser.Circle( this.world.centerX,
-      this.world.centerY - 190,50)
+
     // current score
     this.currentScore = this.add
       .text(
@@ -74,9 +62,10 @@ export default class Menu extends Phaser.State {
 
     // Gift Text
     this.gift = this.add
-      .text(this.world.centerX, this.world.centerY, "Your daily gift", style)
-      .anchor.setTo(0.5, 0.5);
-
+      .text(this.world.centerX, this.world.centerY, "Your daily gift", style);
+      this.gift.anchor.setTo(0.5, 0.5);
+    console.log(this.game);
+    console.log(this.game.world);
     // Leader Bord
     this.leaders = this.add.text(
       this.world.centerX,
@@ -98,7 +87,7 @@ export default class Menu extends Phaser.State {
     this.options.anchor.setTo(0.5, 0.5);
     this.options.inputEnabled = true;
     this.options.events.onInputDown.add(this.toSettings, this);
-
+      this.options.padding.set(10, 16);
     // shop menu
     this.shop = this.add.text(
       this.world.centerX,
@@ -109,6 +98,7 @@ export default class Menu extends Phaser.State {
     this.shop.anchor.setTo(0.5, 0.5);
     this.shop.inputEnabled = true;
     this.shop.events.onInputDown.add(this.toShop, this);
+    this.shop.padding.set(10, 16);
     // Button play
     this.btn = this.add.text(
       this.world.centerX,
@@ -119,6 +109,7 @@ export default class Menu extends Phaser.State {
     this.btn.anchor.setTo(0.5, 0.5);
     this.btn.inputEnabled = true;
     this.btn.events.onInputDown.add(this.startGame, this);
+    this.btn.padding.set(10, 16);
   }
   reset(){
     console.log('Reset------------------------------------------------');

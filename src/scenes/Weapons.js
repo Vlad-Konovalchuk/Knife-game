@@ -218,16 +218,19 @@ export default class Weapons extends Phaser.State {
     this.knifePrice.visible = true;
   }
   setKnife() {
+    this.game.cache.updateFrameData('weapon', this.currentKnife.customParams.class);
     FBInstant.player
       .setDataAsync({
         currentKnife: this.currentKnife.customParams.class
       })
       .then(() => {
         console.log("Yepp! Weapon is set");
+        this.state.restart()
       })
       .catch(err => {
         console.log("Ops! Weapon does not set:(");
         console.log(err);
       });
+
   }
 }

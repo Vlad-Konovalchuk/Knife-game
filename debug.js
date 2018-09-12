@@ -66,3 +66,32 @@ TODO:"Create money"
             //   this.state.start("Play");
             // }, this);
             // sliceCoin.start();
+
+
+
+
+        // in case this is not a legal hit
+        // else {
+        //   this.enemy.resetHealth();
+        //   if (currentLevel < 3) {
+        //     currentLevel++;
+        //   } else {
+        //     currentLevel = 0;
+        //   }
+
+        //   let knifeTweenElse = this.game.add.tween(this.knife);
+        //   knifeTweenElse.to(
+        //     {
+        //       y: this.world.centerY + this.knife.height
+        //     },
+        //     +this.levelData.throwSpeed * 2,
+        //     null,
+        //     false
+        //   );
+        //   knifeTweenElse.onComplete.add(function(tween) {
+        //     this.fbSaveData();
+        //     // this.state.destroy()
+        //     this.state.start("Menu", true, false);
+        //   }, this);
+        //   knifeTweenElse.start();
+        // }

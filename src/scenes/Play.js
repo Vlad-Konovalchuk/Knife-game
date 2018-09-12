@@ -11,13 +11,14 @@ let style = {
   fontWeight: "bold",
   fill: "#fff"
 };
+let coins;
+let legalHit;
 let currentLevel;
-// let enemyCounter;
-
 getUserData();
 
 export default class Play extends Phaser.State {
   preload() {
+    getUserData();
     // Array of targets
     this.enemyGroup = [
       targets.wooden,
@@ -43,8 +44,12 @@ export default class Play extends Phaser.State {
         : "../../assets/knife3.png"
     );
     this.load.spritesheet("coin", coin, 70, 96);
+    // this.coins = coins;
+    this.coins = coins;
   }
   create() {
+    getUserData();
+    console.log(this.coins);
     // Set Scale MAnager for responsive
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
@@ -52,7 +57,7 @@ export default class Play extends Phaser.State {
 
     // Set initial score
     this.score = 0;
-    this.coins = 0;
+    // this.coins = 0;
 
     // Set score text
     this.scoreText = this.add.text(
@@ -194,7 +199,8 @@ export default class Play extends Phaser.State {
         // enemy: enemyCounter,
         currentLevel: currentLevel,
         current: this.score,
-        best: Math.max(playerScore.bestScore, this.score)
+        best: Math.max(playerScore.bestScore, this.score),
+        coins: this.coins
       })
       .then(function() {
         console.log("data is set");
@@ -249,165 +255,23 @@ export default class Play extends Phaser.State {
     // coin depth is the same as target depth
     this.coin.depth = 1;
   }
-  // method to throw a knife
-  throwKnife() {
-    // can the player throw?
-    if (this.canThrow) {
-      // player can't throw anymore
-      this.canThrow = false;
-
-      let knifeThrow = this.game.add.tween(this.knife);
-      knifeThrow.to(
-        {
-          y: this.target.y + this.target.width / 2
-        },
-        +this.levelData.throwSpeed * 2
-      );
-      knifeThrow.onComplete.add(function throwCallback(tween) {
-        // at the moment, this is a legal hit
-        var legalHit = true;
-        // getting an array with all rotating knives
-        var children = this.knifeGroup.children;
-
-        // looping through rotating knives
-        for (var i = 0; i < children.length; i++) {
-          // is the knife too close to the i-th knife?
-          if (
-            Math.abs(
-              Phaser.Math.getShortestAngle(
-                this.target.angle,
-                children[i].impactAngle
-              )
-            ) < +this.levelData.minAngle
-          ) {
-            this.enemy.resetHealth();
-            // this is not a legal hit
-            legalHit = false;
-            // no need to continue with the loop
-            break;
-          }
-        }
-
-        // is this a legal hit
-        if (legalHit && this.enemy.health > 0) {
-          this.checkHitCoin();
-
-          // adding the rotating knife in the same place of the knife just landed on target
-          var knife = this.add.sprite(
-            this.world.width / 2,
-            (this.world.height / 5) * 4,
-            "weapon"
-          );
-
-          // impactAngle property saves the target angle when the knife hits the target
-          knife.impactAngle = this.target.angle;
-
-          // adding the rotating knife to knifeGroup group
-          this.knifeGroup.add(knife);
-
-          // bringing back the knife to its starting position
-          this.knife.y = (this.world.height / 5) * 4;
-
-          this.enemy.hit();
-          console.log(this.target.health);
-          this.target.setHealth(this.target.health - 5);
-          // player can now throw again
-          this.canThrow = true;
-          this.score++;
-          console.log("GROUP", this.enemyGroup);
-          //   Update text of score and health of target
-          this.scoreText.setText(`Score: ${this.score}`);
-          this.health.setText(`Health:${this.target.health}`);
-        } 
-        
-        
-        
-        else if (!legalHit) {
-          this.enemy.resetHealth();
-
-          this.game.paused = true;
-          // Then add the menu
-          this.pauseText = this.add.text(
-            this.game.world.centerX,
-            this.game.world.centerY,
-            "End of the game\n Invite friends\n and continue to hit the target",
-            style
-          );
-          this.pauseText.anchor.setTo(0.5, 0.5);
-          this.pauseText.inputEnabled = true;
-          this.pauseText.events.onInputDown.add(() => {
-            this.game.paused = !this.game.paused;
-          }, this);
-
-          let knifeTweenElse = this.game.add.tween(this.knife);
-          knifeTweenElse.to(
-            {
-              y: this.world.centerY + this.knife.height
-            },
-            +this.levelData.throwSpeed * 2,
-            null,
-            false
-          );
-          knifeTweenElse.onComplete.add(function(tween) {
-            this.fbSaveData();
-            this.state.start("Menu", true, false);
-          }, this);
-          knifeTweenElse.start();
-        }
-
-
-
-        else if(!this.target.health > 0){
-          this.enemy.resetHealth();
-          if (currentLevel < 3) {
-            currentLevel++;
-          } else {
-            currentLevel = 0;
-          }
-
-          let knifeTweenElse = this.game.add.tween(this.knife);
-          knifeTweenElse.to(
-            {
-              y: this.world.centerY + this.knife.height
-            },
-            +this.levelData.throwSpeed * 2,
-            null,
-            false
-          );
-          knifeTweenElse.onComplete.add(function(tween) {
-            this.fbSaveData();
-            this.state.start("Play", true, false);
-          }, this);
-          knifeTweenElse.start();
-        }
-        // in case this is not a legal hit
-        // else {
-        //   this.enemy.resetHealth();
-        //   if (currentLevel < 3) {
-        //     currentLevel++;
-        //   } else {
-        //     currentLevel = 0;
-        //   }
-
-        //   let knifeTweenElse = this.game.add.tween(this.knife);
-        //   knifeTweenElse.to(
-        //     {
-        //       y: this.world.centerY + this.knife.height
-        //     },
-        //     +this.levelData.throwSpeed * 2,
-        //     null,
-        //     false
-        //   );
-        //   knifeTweenElse.onComplete.add(function(tween) {
-        //     this.fbSaveData();
-        //     // this.state.destroy()
-        //     this.state.start("Menu", true, false);
-        //   }, this);
-        //   knifeTweenElse.start();
-        // }
-      }, this);
-      knifeThrow.start();
-    }
+  switchNextLevel() {
+    console.log("Start next level");
+    console.log("CurrentLevel", currentLevel);
+    let knifeTweenElse = this.game.add.tween(this.knife);
+    knifeTweenElse.to(
+      {
+        y: this.world.centerY + this.knife.height
+      },
+      +this.levelData.throwSpeed * 2,
+      null,
+      false
+    );
+    knifeTweenElse.onComplete.add(function(tween) {
+      this.fbSaveData();
+      this.state.start("Play", true, false);
+    }, this);
+    knifeTweenElse.start();
   }
   shareFriends() {
     FBInstant.shareAsync({
@@ -429,8 +293,192 @@ export default class Play extends Phaser.State {
     ) {
       // coin has been hit
       this.coin.hit = true;
+      this.coins += 5;
       this.coinsText.setText(`Coins: ${this.coins}`);
       this.coin.destroy();
+      FBInstant.player
+        .setDataAsync({
+          coins: this.coins
+        })
+        .then(function() {
+          console.log("Coins are save");
+        });
+    }
+  }
+  gameOverMenu() {
+    this.game.paused = true;
+    this.resumeGame = null;
+    const textStyle = {
+      font: "normal 24px Arial",
+      fill: "#ffffff",
+      align: "center",
+      boundsAlignH: "center", // bounds center align horizontally
+      boundsAlignV: "middle" // bounds center align vertically
+    };
+    const text = `
+      Game Over
+      Share with friends and continue game 
+    `;
+    this.graphics = this.add.graphics(0, 0);
+    // this.graphics.pivot.set(0.5,0.5)
+    this.menuText = this.add.text(0, 0, text, textStyle);
+
+    this.shareText = this.add.text(0, 0, "Share with friends", textStyle);
+    this.shareText.inputEnabled = true;
+    this.shareText.events.onInputDown.add(() => {
+      FBInstant.shareAsync({
+        intent: "REQUEST",
+        image: "user",
+        text: "Hey I'm stuck on this target! Can you help me?",
+        data: { myReplayData: "msg" }
+      }).then(() => {
+        console.log("Success share");
+        this.resumeGame = true;
+        this.checkStatusContinue();
+      });
+    }, this);
+    this.restartGame = this.add.text(0, 0, "Restart", textStyle);
+    this.restartGame.inputEnabled = true;
+    this.restartGame.events.onInputDown.add(() => {
+      this.fbSaveData();
+      this.resumeGame = false;
+      this.checkStatusContinue();
+    }, this);
+
+    this.drawMenu();
+  }
+  drawMenu() {
+    // graphics and textElement bounds/sizes must be the same
+    // so your text area covers the whole rectangle
+    this.graphics.beginFill(0x000000, 0.2);
+    this.graphics.drawRect(
+      0,
+      400,
+      550,
+      750
+    );
+    this.menuText.setTextBounds(
+      0,
+      400,
+      550,
+      750
+    );
+    this.shareText.setTextBounds(
+      0,
+      400,
+      550,
+      750
+    );
+    this.restartGame.setTextBounds(
+      0,
+     400,
+      550,
+      750
+    );
+    this.graphics.addChild(this.shareText);
+    this.graphics.addChild(this.restartGame);
+    this.graphics.addChild(this.menuText);
+  }
+  checkStatusContinue() {
+    if (this.resumeGame == true) {
+      console.log("---Success checkStatus");
+      this.game.paused = false;
+      this.graphics.destroy(true);
+      this.setNewKnife();
+    } else {
+      this.game.paused = false;
+      this.enemy.resetHealth();
+      currentLevel = 0;
+      this.state.start("Play", true, false);
+    }
+  }
+  setNewKnife() {
+    // adding the rotating knife in the same place of the knife just landed on target
+    var knife = this.add.sprite(
+      this.world.width / 2,
+      (this.world.height / 5) * 4,
+      "weapon"
+    );
+    // impactAngle property saves the target angle when the knife hits the target
+    knife.impactAngle = this.target.angle;
+    // adding the rotating knife to knifeGroup group
+    this.knifeGroup.add(knife);
+    // bringing back the knife to its starting position
+    this.knife.y = (this.world.height / 5) * 4;
+    this.enemy.hit();
+    this.target.setHealth(this.target.health - 5);
+    // player can now throw again
+    this.canThrow = true;
+    this.score++;
+    //   Update text of score and health of target
+    this.scoreText.setText(`Score: ${this.score}`);
+    this.health.setText(`Health:${this.target.health}`);
+  }
+  test() {
+    // getting an array with all rotating knives
+    var children = this.knifeGroup.children;
+    // looping through rotating knives
+    for (var i = 0; i < children.length; i++) {
+      // is the knife too close to the i-th knife?
+      if (
+        Math.abs(
+          Phaser.Math.getShortestAngle(
+            this.target.angle,
+            children[i].impactAngle
+          )
+        ) < +this.levelData.minAngle
+      ) {
+        this.enemy.resetHealth();
+        // this is not a legal hit
+        legalHit = false;
+        // no need to continue with the loop
+        break;
+      }
+    }
+  }
+  // method to throw a knife
+  throwKnife() {
+    // at the moment, this is a legal hit
+    legalHit = true;
+    // can the player throw?
+    if (this.canThrow) {
+      // player can't throw anymore
+      this.canThrow = false;
+      let knifeThrow = this.game.add.tween(this.knife);
+      knifeThrow.to(
+        {
+          y: this.target.y + this.target.width / 2
+        },
+        +this.levelData.throwSpeed * 2
+      );
+
+      knifeThrow.onComplete.add(function throwCallback(tween) {
+        this.test();
+        // is this a legal hit
+        if (legalHit && this.enemy.health > 0) {
+          // Check if player hit the coin(apple)
+          this.checkHitCoin();
+          // Set the new knife on screen
+          this.setNewKnife();
+        } else if (!legalHit) {
+          // Reset the healt of previous target
+          this.enemy.resetHealth();
+          // Start game over menu
+          this.gameOverMenu();
+        } else if (!this.target.health > 0) {
+          console.log("CurrentLevel", currentLevel);
+
+          // this is not a legal hit
+          this.enemy.resetHealth();
+          // Check size of level
+          currentLevel < 3 ? currentLevel++ : (currentLevel = 0);
+          console.log("You win this level");
+          console.log("CurrentLevel", currentLevel);
+          // Restart Game
+          this.switchNextLevel();
+        }
+      }, this);
+      knifeThrow.start();
     }
   }
 }
@@ -440,7 +488,8 @@ async function getUserData() {
     let response = await FBInstant.player.getDataAsync([
       "best",
       "currentLevel",
-      "current"
+      "current",
+      "coins"
     ]);
     console.log("Response", response);
     if (response.best !== undefined && response.currentLevel !== undefined) {
@@ -449,8 +498,10 @@ async function getUserData() {
       }
       playerScore.bestScore = response.best;
       currentLevel = response.currentLevel;
+      coins = response.coins !== undefined ? response.coins : 0;
     } else {
       console.log("Problems");
+      currentLevel = 0;
     }
   } catch (error) {
     console.log(error);
