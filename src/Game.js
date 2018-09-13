@@ -41,7 +41,6 @@ class User {
     this.best = response[3].best;
     this.coins = response.coins;
     this.currentLevel = response.currentLevel;
-
   }
   async getActualScore() {
     try {
@@ -63,7 +62,8 @@ async function getFB() {
       FBInstant.player.getName(),
       FBInstant.player.getPhoto(),
       FBInstant.player.getConnectedPlayersAsync(),
-      FBInstant.player.getDataAsync(["current", "best","currentLevel","coins"])
+      FBInstant.player.getDataAsync(["current", "best","currentLevel","coins"]),
+      FBInstant.context.getID()
     ]);
 
     console.log(response);
