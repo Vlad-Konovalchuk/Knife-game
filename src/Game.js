@@ -25,7 +25,6 @@ class Game extends Phaser.Game {
     this.state.add("Settings", Settings);
     this.state.add("Leaders", Leaders);
     this.state.add("Weapons", Weapons);
-
     this.state.start("Menu");
   }
 }

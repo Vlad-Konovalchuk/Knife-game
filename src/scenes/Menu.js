@@ -13,11 +13,9 @@ export default class Menu extends Phaser.State {
   }
   create() {
     user.getActualScore()
-    console.log(this.cache); 
     this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     this.scale.pageAlignHorizontally = true;
     this.scale.pageAlignVertically = true;
-    console.log("user", user);
     let title = this.add.text(
       this.world.centerX,
       this.world.centerY - 300,
@@ -64,8 +62,6 @@ export default class Menu extends Phaser.State {
     this.gift = this.add
       .text(this.world.centerX, this.world.centerY, "Your daily gift", style);
       this.gift.anchor.setTo(0.5, 0.5);
-    console.log(this.game);
-    console.log(this.game.world);
     // Leader Bord
     this.leaders = this.add.text(
       this.world.centerX,
@@ -112,7 +108,6 @@ export default class Menu extends Phaser.State {
     this.btn.padding.set(10, 16);
   }
   reset(){
-    console.log('Reset------------------------------------------------');
     this.state.restart()
   }
   startGame() {

@@ -237,7 +237,6 @@ export default class Play extends Phaser.State {
   setLeaderBoardScore() {
     FBInstant.getLeaderboardAsync("leaders")
       .then(leaderboard => {
-        console.log(leaderboard.getName());
         return leaderboard.setScoreAsync(
           Math.max(playerScore.bestScore, this.score),
           `{knife: "elf", level: ${currentLevel}}`
@@ -248,9 +247,8 @@ export default class Play extends Phaser.State {
   }
   getLeaderBoardScore() {
     FBInstant.getLeaderboardAsync("leaders")
-      .then(leaderboard => leaderboard.getEntriesAsync(10, 0))
+      .then(leaderboard => leaderboard.getEntriesAsync(5, 0))
       .then(entries => {
-        console.log("TOP SCORES");
         console.log('All entries', entries);
         for (var i = 0; i < entries.length; i++) {
           console.log(
